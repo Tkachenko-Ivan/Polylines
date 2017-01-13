@@ -98,8 +98,8 @@ namespace PolylinesComparer
                 // Проекция на OYZ (OY - абсцисса; OZ - ордината)
                 CellsFromLine(b, c, d, prevCoordinate.Lat, prevCoordinate.H, сoordinate.Lat, сoordinate.H, subResultProject2);
 
-                result = subResultProject1.Join(subResultProject2, p1 => p1.Row, p2 => p2.Column,
-                    (p1, p2) => new GridCell(p2.Column, p1.Column, p2.Row)).ToList();
+                result.AddRange(subResultProject1.Join(subResultProject2, p1 => p1.Row, p2 => p2.Column,
+                    (p1, p2) => new GridCell(p2.Column, p1.Column, p2.Row)).ToList());
             }
             else if (Math.Abs(a) < Math.Abs(b) && Math.Abs(a) < Math.Abs(c))
             {
@@ -109,8 +109,8 @@ namespace PolylinesComparer
                 // Проекция на OXZ (OX - абсцисса; OZ - ордината)
                 CellsFromLine(a, c, d, prevCoordinate.Lon, prevCoordinate.H, сoordinate.Lon, сoordinate.H, subResultProject2);
 
-                result = subResultProject1.Join(subResultProject2, p1 => p1.Column, p2 => p2.Column,
-                    (p1, p2) => new GridCell(p1.Row, p1.Column, p2.Row)).ToList();
+                result.AddRange(subResultProject1.Join(subResultProject2, p1 => p1.Column, p2 => p2.Column,
+                    (p1, p2) => new GridCell(p1.Row, p1.Column, p2.Row)).ToList());
             }
             else
             {
@@ -120,8 +120,8 @@ namespace PolylinesComparer
                 // Проекция на OYZ (OY - абсцисса; OZ - ордината)
                 CellsFromLine(b, c, d, prevCoordinate.Lat, prevCoordinate.H, сoordinate.Lat, сoordinate.H, subResultProject2);
 
-                result = subResultProject1.Join(subResultProject2, p1 => p1.Row, p2 => p2.Row,
-                    (p1, p2) => new GridCell(p2.Column, p1.Column, p1.Row)).ToList();
+                result.AddRange(subResultProject1.Join(subResultProject2, p1 => p1.Row, p2 => p2.Row,
+                    (p1, p2) => new GridCell(p2.Column, p1.Column, p1.Row)).ToList());
             }
         }
 
