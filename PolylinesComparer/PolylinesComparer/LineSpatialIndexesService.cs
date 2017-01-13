@@ -1,6 +1,7 @@
 ﻿using PolylinesComparer.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace PolylinesComparer
@@ -8,6 +9,7 @@ namespace PolylinesComparer
     /// <summary>
     /// Создание пространственного индекса для полилинии
     /// </summary>
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     class LineSpatialIndexesService
     {
         private readonly double _precision;
@@ -49,7 +51,7 @@ namespace PolylinesComparer
                 if (_hasH)
                     CellsFromLine3D(prevCoordinate, currentCoordinate, ref result);
                 else
-                    CellsFromLine(prevCoordinate, currentCoordinate, ref result);
+                    FillingCells(prevCoordinate, currentCoordinate, ref result);
                 //CellFromPoint(currentCoordinate, result); // вроде же не нужна
 
                 prevCoordinate = currentCoordinate;
@@ -62,17 +64,43 @@ namespace PolylinesComparer
         /// </summary>
         private void CellFromPoint(Coordinate сoordinate, List<GridCell> result)
         {
-            var distX = (int)Math.Floor(сoordinate.Lon / _precision); // Колонка справа
-            var distY = (int)Math.Floor(сoordinate.Lat / _precision); // Строка сверху
+            var distX = (int) Math.Floor(сoordinate.Lon / _precision); // Колонка справа
+            var distY = (int) Math.Floor(сoordinate.Lat / _precision); // Строка сверху
 
-            AddToResult(distX, distY, result);
+            if (_hasH)
+            {
+                var distZ = (int)Math.Floor(сoordinate.H / _precision); // Слой сверху
 
-            if (сoordinate.Lon % _precision == 0)
-                AddToResult(distX - 1, distY, result);
-            if (сoordinate.Lat % _precision == 0)
-                AddToResult(distX, distY - 1, result);
-            if (сoordinate.Lat % _precision == 0 && сoordinate.Lon % _precision == 0)
-                AddToResult(distX - 1, distY - 1, result);
+                AddToResult(distX, distY, distZ, result);
+
+                if (сoordinate.Lon % _precision == 0)
+                    AddToResult(distX - 1, distY, distZ, result);
+                if (сoordinate.Lat % _precision == 0)
+                    AddToResult(distX, distY - 1, distZ, result);
+                if (сoordinate.H % _precision == 0)
+                    AddToResult(distX, distY, distZ - 1, result);
+
+                if (сoordinate.Lon % _precision == 0 && сoordinate.Lat % _precision == 0)
+                    AddToResult(distX - 1, distY - 1, distZ, result);
+                if (сoordinate.Lon % _precision == 0 && сoordinate.H % _precision == 0)
+                    AddToResult(distX - 1, distY, distZ - 1, result);
+                if (сoordinate.Lat % _precision == 0 && сoordinate.H % _precision == 0)
+                    AddToResult(distX, distY - 1, distZ - 1, result);
+
+                if (сoordinate.Lon % _precision == 0 && сoordinate.Lat % _precision == 0 && сoordinate.H % _precision == 0 )
+                    AddToResult(distX - 1, distY - 1, distZ - 1, result);
+            }
+            else
+            {
+                AddToResult(distX, distY, result);
+
+                if (сoordinate.Lon % _precision == 0)
+                    AddToResult(distX - 1, distY, result);
+                if (сoordinate.Lat % _precision == 0)
+                    AddToResult(distX, distY - 1, result);
+                if (сoordinate.Lat % _precision == 0 && сoordinate.Lon % _precision == 0)
+                    AddToResult(distX - 1, distY - 1, result);
+            }
         }
 
         /// <summary>
@@ -94,9 +122,9 @@ namespace PolylinesComparer
             {
                 // По Y
                 // Проекция на OXY (OX - абсцисса; OY - ордината)
-                CellsFromLine(a, b, d, prevCoordinate.Lon, prevCoordinate.Lat, сoordinate.Lon, сoordinate.Lat, subResultProject1);
+                FillingCells(a, b, d, prevCoordinate.Lon, prevCoordinate.Lat, сoordinate.Lon, сoordinate.Lat, subResultProject1);
                 // Проекция на OYZ (OY - абсцисса; OZ - ордината)
-                CellsFromLine(b, c, d, prevCoordinate.Lat, prevCoordinate.H, сoordinate.Lat, сoordinate.H, subResultProject2);
+                FillingCells(b, c, d, prevCoordinate.Lat, prevCoordinate.H, сoordinate.Lat, сoordinate.H, subResultProject2);
 
                 result.AddRange(subResultProject1.Join(subResultProject2, p1 => p1.Row, p2 => p2.Column,
                     (p1, p2) => new GridCell(p2.Column, p1.Column, p2.Row)).ToList());
@@ -105,9 +133,9 @@ namespace PolylinesComparer
             {
                 // По X
                 // Проекция на OXY (OX - абсцисса; OY - ордината)
-                CellsFromLine(a, b, d, prevCoordinate.Lon, prevCoordinate.Lat, сoordinate.Lon, сoordinate.Lat, subResultProject1);
+                FillingCells(a, b, d, prevCoordinate.Lon, prevCoordinate.Lat, сoordinate.Lon, сoordinate.Lat, subResultProject1);
                 // Проекция на OXZ (OX - абсцисса; OZ - ордината)
-                CellsFromLine(a, c, d, prevCoordinate.Lon, prevCoordinate.H, сoordinate.Lon, сoordinate.H, subResultProject2);
+                FillingCells(a, c, d, prevCoordinate.Lon, prevCoordinate.H, сoordinate.Lon, сoordinate.H, subResultProject2);
 
                 result.AddRange(subResultProject1.Join(subResultProject2, p1 => p1.Column, p2 => p2.Column,
                     (p1, p2) => new GridCell(p1.Row, p1.Column, p2.Row)).ToList());
@@ -116,9 +144,9 @@ namespace PolylinesComparer
             {
                 // По Z
                 // Проекция на OXZ (OX - абсцисса; OZ - ордината)
-                CellsFromLine(a, c, d, prevCoordinate.Lon, prevCoordinate.H, сoordinate.Lon, сoordinate.H, subResultProject1);
+                FillingCells(a, c, d, prevCoordinate.Lon, prevCoordinate.H, сoordinate.Lon, сoordinate.H, subResultProject1);
                 // Проекция на OYZ (OY - абсцисса; OZ - ордината)
-                CellsFromLine(b, c, d, prevCoordinate.Lat, prevCoordinate.H, сoordinate.Lat, сoordinate.H, subResultProject2);
+                FillingCells(b, c, d, prevCoordinate.Lat, prevCoordinate.H, сoordinate.Lat, сoordinate.H, subResultProject2);
 
                 result.AddRange(subResultProject1.Join(subResultProject2, p1 => p1.Row, p2 => p2.Row,
                     (p1, p2) => new GridCell(p2.Column, p1.Column, p1.Row)).ToList());
@@ -128,19 +156,19 @@ namespace PolylinesComparer
         /// <summary>
         /// Построение индекса линии на плоскости
         /// </summary>
-        private void CellsFromLine(Coordinate prevCoordinate, Coordinate сoordinate, ref List<GridCell> result)
+        private void FillingCells(Coordinate prevCoordinate, Coordinate сoordinate, ref List<GridCell> result)
         {
             // Уравнение прямой между этими двумя точками
             double a, b, c;
             LineEquation(prevCoordinate, сoordinate, out a, out b, out c);
 
-            CellsFromLine(a, b, c, prevCoordinate.Lon, prevCoordinate.Lat, сoordinate.Lon, сoordinate.Lat, result);
+            FillingCells(a, b, c, prevCoordinate.Lon, prevCoordinate.Lat, сoordinate.Lon, сoordinate.Lat, result);
         }
 
         /// <summary>
         /// Заполняет ячейки сетки, которые лежат на прямой между первой и второй точкой на плоскости
         /// </summary>
-        private void CellsFromLine(double a, double b, double c, double prevDistX, double prevDistY, double distX, double distY, List<GridCell> result)
+        private void FillingCells(double a, double b, double c, double prevDistX, double prevDistY, double distX, double distY, List<GridCell> result)
         {
             if (Math.Abs(b) < Math.Abs(a))
             {
@@ -249,6 +277,13 @@ namespace PolylinesComparer
             if (column != -1 && row != -1)
                 if (!result.Any(n => n.Column == column && n.Row == row))
                     result.Add(new GridCell(row, column));
+        }
+
+        private void AddToResult(int column, int row, int layer, List<GridCell> result)
+        {
+            if (column != -1 && row != -1 && layer != -1)
+                if (!result.Any(n => n.Column == column && n.Row == row && n.Layer == layer))
+                    result.Add(new GridCell(row, column, layer));
         }
 
         /// <summary>
