@@ -1,5 +1,4 @@
 ﻿using PolylinesComparer.Model;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace PolylinesComparer
@@ -17,19 +16,31 @@ namespace PolylinesComparer
         /// <param name="precision">Шаг сетки</param>
         /// <param name="compliance">Ожидаемая степень соответствия, где 1 - полное соответствие</param>
         /// <returns>ИСТИНА - если линии совпали</returns>
-        public bool LaneCompare(List<Coordinate> firstLine, List<Coordinate> secondLine, double precision, double compliance)
+        public bool LaneCompare(Line firstLine, Line secondLine, double precision, double compliance)
         {
             if (firstLine.Count == 0 && secondLine.Count == 0)
                 return true;
             if (firstLine.Count == 0 || secondLine.Count == 0)
                 return false;
 
-            // Найти точку, коотрая станет началом координат
-            var unated = firstLine.Concat(secondLine).ToList();
+            bool is3D = firstLine.HasH && secondLine.HasH;
+
+            // Найти точку, которая станет началом координат
+            Coordinate origin;
+            var unated = firstLine.Coordinates.Concat(secondLine.Coordinates).ToList();
             var minX = unated.Min(n => n.Lon);
             var minY = unated.Min(n => n.Lat);
+            if (is3D)
+            {
+                // Для трёхмерного пространства
+                var minZ = unated.Min(n => n.H);
+                origin = new Coordinate(minX, minY, minZ);
+            }
+            else
+                origin = new Coordinate(minX, minY);
 
-            var comparer = new LineSpatialIndexesService(precision, new Coordinate { Lon = minX, Lat = minY });
+            // Создание сервиса, которому выпала участь сравнивать эти линии
+            var comparer = new LineSpatialIndexesService(precision, origin, is3D);
 
             var firstIndex = comparer.GetLineSpatialIndexes(firstLine);
             var lastIndex = comparer.GetLineSpatialIndexes(secondLine);

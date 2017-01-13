@@ -3,10 +3,26 @@
     /// <summary>
     /// Ячейка пространственного индекса
     /// </summary>
-    class GridCell
+    internal class GridCell
     {
-        public int Row { get; set; }
+        public GridCell(int row, int column)
+        {
+            Row = row;
+            Column = column;
+            Layer = 0;
+        }
 
-        public int Column { get; set; }
+        public GridCell(int row, int column, int layer)
+        {
+            Row = row;
+            Column = column;
+            Layer = layer;
+        }
+
+        public int Row { get; private set; }
+
+        public int Column { get; private set; }
+
+        public int Layer { get; private set; }
     }
 }

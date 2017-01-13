@@ -14,37 +14,45 @@ namespace PolylinesComparer
 
         private readonly Coordinate _origin;
 
+        private readonly bool _hasH;
+
         /// <summary>
         /// Создание пространственного индекса 
         /// </summary>
         /// <param name="precision">Шаг сетки пространственного индекса</param>
         /// <param name="origin">Начало координат</param>
-        public LineSpatialIndexesService(double precision, Coordinate origin)
+        /// <param name="hasH">Работа с координатами в пространстве (3D)</param>
+        public LineSpatialIndexesService(double precision, Coordinate origin, bool hasH)
         {
             _precision = precision;
             _origin = origin;
+            _hasH = hasH;
         }
 
-        public List<GridCell> GetLineSpatialIndexes(List<Coordinate> line)
+        public List<GridCell> GetLineSpatialIndexes(Line line)
         {
             var result = new List<GridCell>();
-            if (!line.Any())
+            if (!line.Coordinates.Any())
                 return result;
 
-            var prevX = line[0].Lon - _origin.Lon;
-            var prevY = line[0].Lat - _origin.Lat;
+            var prevX = line.Coordinates[0].Lon - _origin.Lon;
+            var prevY = line.Coordinates[0].Lat - _origin.Lat;
+            var prevCoordinate = _hasH ? new Coordinate(prevX, prevY, line.Coordinates[0].H - _origin.H) : new Coordinate(prevX, prevY);
 
-            CellFromPoint(prevX, prevY, result);
+            CellFromPoint(prevCoordinate, result);
             for (int i = 1; i < line.Count; i++)
             {
-                var currentX = line[i].Lon - _origin.Lon;
-                var currentY = line[i].Lat - _origin.Lat;
+                var currentX = line.Coordinates[i].Lon - _origin.Lon;
+                var currentY = line.Coordinates[i].Lat - _origin.Lat;
+                var currentCoordinate = _hasH ? new Coordinate(currentX, currentY, line.Coordinates[i].H - _origin.H) : new Coordinate(currentX, currentY);
 
-                CellsFromLine(prevX, prevY, currentX, currentY, result);
-                CellFromPoint(currentX, currentY, result);
+                if (_hasH)
+                    CellsFromLine3D(prevCoordinate, currentCoordinate, ref result);
+                else
+                    CellsFromLine(prevCoordinate, currentCoordinate, ref result);
+                //CellFromPoint(currentCoordinate, result); // вроде же не нужна
 
-                prevX = currentX;
-                prevY = currentY;
+                prevCoordinate = currentCoordinate;
             }
             return result;
         }
@@ -52,30 +60,88 @@ namespace PolylinesComparer
         /// <summary>
         /// Заполняет ячейку сетки по координатам точки
         /// </summary>
-        private void CellFromPoint(double x, double y, List<GridCell> result)
+        private void CellFromPoint(Coordinate сoordinate, List<GridCell> result)
         {
-            var distX = (int)Math.Floor(x / _precision); // Колонка справа
-            var distY = (int)Math.Floor(y / _precision); // Строка сверху
+            var distX = (int)Math.Floor(сoordinate.Lon / _precision); // Колонка справа
+            var distY = (int)Math.Floor(сoordinate.Lat / _precision); // Строка сверху
+
             AddToResult(distX, distY, result);
 
-            if (x % _precision == 0)
+            if (сoordinate.Lon % _precision == 0)
                 AddToResult(distX - 1, distY, result);
-            if (y % _precision == 0)
+            if (сoordinate.Lat % _precision == 0)
                 AddToResult(distX, distY - 1, result);
-            if (y % _precision == 0 && x % _precision == 0)
+            if (сoordinate.Lat % _precision == 0 && сoordinate.Lon % _precision == 0)
                 AddToResult(distX - 1, distY - 1, result);
         }
 
         /// <summary>
-        /// Заполняет ячейки сетки, которые лежат на прямой между первой и второй точкой
+        /// Построение индекса линии в пространстве
         /// </summary>
-        private void CellsFromLine(double prevDistX, double prevDistY, double distX, double distY, List<GridCell> result)
+        /// <remarks>
+        /// Вместо трёхмерного пространства рассматривается две проекции, тем самым исключая аппликату из расчёта
+        /// </remarks>
+        private void CellsFromLine3D(Coordinate prevCoordinate, Coordinate сoordinate, ref List<GridCell> result)
+        {
+            // Уравнение прямой между этими двумя точками
+            double a, b, c, d;
+            LineEquation(prevCoordinate, сoordinate, out a, out b, out c, out d);
+
+            var subResultProject1 = new List<GridCell>();
+            var subResultProject2 = new List<GridCell>();
+
+            if (Math.Abs(b) < Math.Abs(a) && Math.Abs(b) < Math.Abs(c))
+            {
+                // По Y
+                // Проекция на OXY (OX - абсцисса; OY - ордината)
+                CellsFromLine(a, b, d, prevCoordinate.Lon, prevCoordinate.Lat, сoordinate.Lon, сoordinate.Lat, subResultProject1);
+                // Проекция на OYZ (OY - абсцисса; OZ - ордината)
+                CellsFromLine(b, c, d, prevCoordinate.Lat, prevCoordinate.H, сoordinate.Lat, сoordinate.H, subResultProject2);
+
+                result = subResultProject1.Join(subResultProject2, p1 => p1.Row, p2 => p2.Column,
+                    (p1, p2) => new GridCell(p2.Column, p1.Column, p2.Row)).ToList();
+            }
+            else if (Math.Abs(a) < Math.Abs(b) && Math.Abs(a) < Math.Abs(c))
+            {
+                // По X
+                // Проекция на OXY (OX - абсцисса; OY - ордината)
+                CellsFromLine(a, b, d, prevCoordinate.Lon, prevCoordinate.Lat, сoordinate.Lon, сoordinate.Lat, subResultProject1);
+                // Проекция на OXZ (OX - абсцисса; OZ - ордината)
+                CellsFromLine(a, c, d, prevCoordinate.Lon, prevCoordinate.H, сoordinate.Lon, сoordinate.H, subResultProject2);
+
+                result = subResultProject1.Join(subResultProject2, p1 => p1.Column, p2 => p2.Column,
+                    (p1, p2) => new GridCell(p1.Row, p1.Column, p2.Row)).ToList();
+            }
+            else
+            {
+                // По Z
+                // Проекция на OXZ (OX - абсцисса; OZ - ордината)
+                CellsFromLine(a, c, d, prevCoordinate.Lon, prevCoordinate.H, сoordinate.Lon, сoordinate.H, subResultProject1);
+                // Проекция на OYZ (OY - абсцисса; OZ - ордината)
+                CellsFromLine(b, c, d, prevCoordinate.Lat, prevCoordinate.H, сoordinate.Lat, сoordinate.H, subResultProject2);
+
+                result = subResultProject1.Join(subResultProject2, p1 => p1.Row, p2 => p2.Row,
+                    (p1, p2) => new GridCell(p2.Column, p1.Column, p1.Row)).ToList();
+            }
+        }
+
+        /// <summary>
+        /// Построение индекса линии на плоскости
+        /// </summary>
+        private void CellsFromLine(Coordinate prevCoordinate, Coordinate сoordinate, ref List<GridCell> result)
         {
             // Уравнение прямой между этими двумя точками
             double a, b, c;
-            LineEquation(new Coordinate { Lat = prevDistY, Lon = prevDistX },
-                new Coordinate { Lat = distY, Lon = distX }, out a, out b, out c);
+            LineEquation(prevCoordinate, сoordinate, out a, out b, out c);
 
+            CellsFromLine(a, b, c, prevCoordinate.Lon, prevCoordinate.Lat, сoordinate.Lon, сoordinate.Lat, result);
+        }
+
+        /// <summary>
+        /// Заполняет ячейки сетки, которые лежат на прямой между первой и второй точкой на плоскости
+        /// </summary>
+        private void CellsFromLine(double a, double b, double c, double prevDistX, double prevDistY, double distX, double distY, List<GridCell> result)
+        {
             if (Math.Abs(b) < Math.Abs(a))
             {
                 if (a > 0)
@@ -92,11 +158,12 @@ namespace PolylinesComparer
             }
         }
 
+
         private void IncreasesByX(double a, double b, double c, double prevDistX, double distX,
             List<GridCell> result)
         {
             var stColumn = (int)Math.Floor(prevDistX / _precision); // Колонка, которой принадлежит начальная точка
-            var xGrid = (++stColumn) * _precision; // Коорданата X правой границы сетки
+            var xGrid = ++stColumn * _precision; // Коорданата X правой границы сетки
             while (xGrid <= distX)
             {
                 var y = -(a * xGrid + c) / b; // Значение Y в этой точке
@@ -109,7 +176,7 @@ namespace PolylinesComparer
                     AddToResult(stColumn - 1, stRow - 1, result);
                     AddToResult(stColumn, stRow - 1, result);
                 }
-                xGrid = (++stColumn) * _precision;
+                xGrid = ++stColumn * _precision;
             }
         }
 
@@ -130,7 +197,7 @@ namespace PolylinesComparer
                     AddToResult(stColumn, stRow - 1, result);
                     AddToResult(stColumn - 1, stRow - 1, result);
                 }
-                xGrid = (--stColumn) * _precision;
+                xGrid = --stColumn * _precision;
             }
         }
 
@@ -138,7 +205,7 @@ namespace PolylinesComparer
             List<GridCell> result)
         {
             var stRow = (int)Math.Floor(prevDistY / _precision); // Строка, которой принадлежит начальная точка
-            var yGrid = (++stRow) * _precision; // Коорданата Y верхней границы сетки
+            var yGrid = ++stRow * _precision; // Коорданата Y верхней границы сетки
             while (yGrid <= distY)
             {
                 var x = -(b * yGrid + c) / a; // Значение X в этой точке
@@ -151,7 +218,7 @@ namespace PolylinesComparer
                     AddToResult(stColumn - 1, stRow - 1, result);
                     AddToResult(stColumn - 1, stRow, result);
                 }
-                yGrid = (++stRow) * _precision;
+                yGrid = ++stRow * _precision;
             }
         }
 
@@ -172,25 +239,56 @@ namespace PolylinesComparer
                     AddToResult(stColumn - 1, stRow, result);
                     AddToResult(stColumn - 1, stRow - 1, result);
                 }
-                yGrid = (--stRow) * _precision;
+                yGrid = --stRow * _precision;
             }
         }
+
 
         private void AddToResult(int column, int row, List<GridCell> result)
         {
             if (column != -1 && row != -1)
                 if (!result.Any(n => n.Column == column && n.Row == row))
-                    result.Add(new GridCell { Column = column, Row = row });
+                    result.Add(new GridCell(row, column));
         }
 
         /// <summary>
-        /// По двум точкам определяет константы для уравнения прямой
+        /// По двум точкам определяет константы для уравнения прямой на плоскости
         /// </summary>
+        /// <remarks>
+        /// Ax + By + C = 0
+        /// </remarks>
         public static void LineEquation(Coordinate firstPoint, Coordinate secondPoint, out double a, out double b, out double c)
         {
-            a = secondPoint.Lat - firstPoint.Lat;
-            b = firstPoint.Lon - secondPoint.Lon;
-            c = secondPoint.Lon * firstPoint.Lat - secondPoint.Lat * firstPoint.Lon;
+            double x1 = firstPoint.Lon;
+            double x2 = secondPoint.Lon;
+            double y1 = firstPoint.Lat;
+            double y2 = secondPoint.Lat;
+
+            a = y2 - y1;
+            b = x1 - x2;
+            c = x2 * y1 - y2 * x1;
+        }
+
+        /// <summary>
+        /// По двум точкам определяет константы для уравнения прямой в пространстве
+        /// </summary>
+        /// <remarks>
+        /// Ax + By + Cz + D = 0
+        /// </remarks>
+        public static void LineEquation(Coordinate firstPoint, Coordinate secondPoint, out double a, out double b,
+            out double c, out double d)
+        {
+            double x1 = firstPoint.Lon;
+            double x2 = secondPoint.Lon;
+            double y1 = firstPoint.Lat;
+            double y2 = secondPoint.Lat;
+            double z1 = firstPoint.H;
+            double z2 = secondPoint.H;
+
+            a = y2 * z2 - y2 * z1 - y1 * z2 + y1 * z1;
+            b = x2 * z1 - x2 * z2 + x1 * z2 - x1 * z1;
+            c = x2 * y1 - x2 * y2 + x1 * y2 - x1 * y1;
+            d = y1*x2*z2 - x1*y2*z2 + z1*y2*x2 - 2*y1*x2*z1 + x1*y1*z1;
         }
     }
 }

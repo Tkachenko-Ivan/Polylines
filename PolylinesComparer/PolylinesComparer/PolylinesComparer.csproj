@@ -43,6 +43,7 @@
     <Compile Include="LineSpatialIndexesService.cs" />
     <Compile Include="Model\Coordinate.cs" />
     <Compile Include="Model\GridCell.cs" />
+    <Compile Include="Model\Line.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
