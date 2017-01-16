@@ -3,7 +3,7 @@
     /// <summary>
     /// Ячейка пространственного индекса
     /// </summary>
-    internal class GridCell
+    public class GridCell
     {
         public GridCell(int row, int column)
         {

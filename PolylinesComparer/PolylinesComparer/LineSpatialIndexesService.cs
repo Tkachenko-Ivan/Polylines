@@ -10,7 +10,7 @@ namespace PolylinesComparer
     /// Создание пространственного индекса для полилинии
     /// </summary>
     [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
-    class LineSpatialIndexesService
+    public class LineSpatialIndexesService
     {
         private readonly double _precision;
 
@@ -31,31 +31,34 @@ namespace PolylinesComparer
             _hasH = hasH;
         }
 
-        public List<GridCell> GetLineSpatialIndexes(Line line)
+        public List<GridCell> GetLineSpatialIndexes(List<Coordinate> line)
         {
             var result = new List<GridCell>();
-            if (!line.Coordinates.Any())
+            if (!line.Any())
                 return result;
 
-            var prevX = line.Coordinates[0].Lon - _origin.Lon;
-            var prevY = line.Coordinates[0].Lat - _origin.Lat;
-            var prevCoordinate = _hasH ? new Coordinate(prevX, prevY, line.Coordinates[0].H - _origin.H) : new Coordinate(prevX, prevY);
+            var prevX = line[0].Lon - _origin.Lon;
+            var prevY = line[0].Lat - _origin.Lat;
+            var prevCoordinate = _hasH ? new Coordinate(prevX, prevY, line[0].H - _origin.H) : new Coordinate(prevX, prevY);
 
             CellFromPoint(prevCoordinate, result);
             for (int i = 1; i < line.Count; i++)
             {
-                var currentX = line.Coordinates[i].Lon - _origin.Lon;
-                var currentY = line.Coordinates[i].Lat - _origin.Lat;
-                var currentCoordinate = _hasH ? new Coordinate(currentX, currentY, line.Coordinates[i].H - _origin.H) : new Coordinate(currentX, currentY);
+                var currentX = line[i].Lon - _origin.Lon;
+                var currentY = line[i].Lat - _origin.Lat;
+                var currentCoordinate = _hasH
+                    ? new Coordinate(currentX, currentY, line[i].H - _origin.H)
+                    : new Coordinate(currentX, currentY);
 
                 if (_hasH)
                     CellsFromLine3D(prevCoordinate, currentCoordinate, ref result);
                 else
                     FillingCells(prevCoordinate, currentCoordinate, ref result);
-                //CellFromPoint(currentCoordinate, result); // вроде же не нужна
 
+                CellFromPoint(currentCoordinate, result);
                 prevCoordinate = currentCoordinate;
             }
+            
             return result;
         }
 
