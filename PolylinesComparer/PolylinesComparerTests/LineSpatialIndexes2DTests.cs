@@ -7,7 +7,7 @@ using PolylinesComparer.Model;
 namespace PolylinesComparerTests
 {
     /// <summary>
-    /// Создание пространственных индексов на плоскости
+    /// Тестирование создания пространственных индексов на плоскости
     /// </summary>
     [TestClass]
     public class LineSpatialIndexes2DTests
@@ -20,12 +20,12 @@ namespace PolylinesComparerTests
         /// Тест должен показать что оно вообще работает, и что не появляется избыточных записей
         /// </remarks>
         [TestMethod]
-        public void SimpleIndexesTest()
+        public void SimpleIndexes2DTest()
         {
-            var indexesService = new LineSpatialIndexesService(10, new Coordinate(0, 0), false);
+            var indexesService = new LineSpatialIndexesService(10, new Coordinate(0, 0));
 
             var line = new List<Coordinate> {new Coordinate(17, 12), new Coordinate(57, 18)};
-            var index = indexesService.GetLineSpatialIndexes(line);
+            var index = indexesService.GetLineSpatial2DIndexes(line);
 
             Assert.AreEqual(5, index.Count, "Неверное количество ячеек индекса");
             Assert.IsTrue(index.Any(sp => sp.Row == 1 && sp.Column == 1));
@@ -44,12 +44,12 @@ namespace PolylinesComparerTests
         ///     как их пересекает линия
         /// </remarks>
         [TestMethod]
-        public void LeftOrRightIntersectIndexesTest()
+        public void LeftOrRightIntersectIndexes2DTest()
         {
-            var indexesService = new LineSpatialIndexesService(10, new Coordinate(0, 0), false);
+            var indexesService = new LineSpatialIndexesService(10, new Coordinate(0, 0));
 
             var line = new List<Coordinate> {new Coordinate(13, 8), new Coordinate(34, 25)};
-            var index = indexesService.GetLineSpatialIndexes(line);
+            var index = indexesService.GetLineSpatial2DIndexes(line);
 
             Assert.AreEqual(5, index.Count, "Неверное количество ячеек индекса");
             Assert.IsTrue(index.Any(sp => sp.Row == 0 && sp.Column == 1));
@@ -69,12 +69,12 @@ namespace PolylinesComparerTests
         ///     даже если отсутствует пересечение с границей сетки
         /// </remarks>
         [TestMethod]
-        public void NotIntersectVerticalLinesIndexesTest()
+        public void NotIntersectVerticalLinesIndexes2DTest()
         {
-            var indexesService = new LineSpatialIndexesService(10, new Coordinate(0, 0), false);
+            var indexesService = new LineSpatialIndexesService(10, new Coordinate(0, 0));
 
             var line = new List<Coordinate> {new Coordinate(4, 8), new Coordinate(26, 22)};
-            var index = indexesService.GetLineSpatialIndexes(line);
+            var index = indexesService.GetLineSpatial2DIndexes(line);
 
             Assert.AreEqual(5, index.Count, "Неверное количество ячеек индекса");
             Assert.IsTrue(index.Any(sp => sp.Row == 0 && sp.Column == 0));
@@ -89,9 +89,9 @@ namespace PolylinesComparerTests
         ///     которая полностью умещается в одной единственной ячейке пространственного индекса
         /// </summary>
         [TestMethod]
-        public void LineInCellIndexesTest()
+        public void LineInCellIndexes2DTest()
         {
-            var indexesService = new LineSpatialIndexesService(10, new Coordinate(0, 0), false);
+            var indexesService = new LineSpatialIndexesService(10, new Coordinate(0, 0));
 
             var line = new List<Coordinate>
             {
@@ -101,7 +101,7 @@ namespace PolylinesComparerTests
                 new Coordinate(18, 15),
                 new Coordinate(17, 11)
             };
-            var index = indexesService.GetLineSpatialIndexes(line);
+            var index = indexesService.GetLineSpatial2DIndexes(line);
 
             Assert.AreEqual(1, index.Count, "Неверное количество ячеек индекса");
             Assert.IsTrue(index.Any(sp => sp.Row == 1 && sp.Column == 1));
@@ -115,9 +115,9 @@ namespace PolylinesComparerTests
         /// Тест должен показать что такие участки не выпадают из индекса
         /// </remarks>
         [TestMethod]
-        public void SegmentinCellIndexesTest()
+        public void SegmentinCellIndexes2DTest()
         {
-            var indexesService = new LineSpatialIndexesService(10, new Coordinate(0, 0), false);
+            var indexesService = new LineSpatialIndexesService(10, new Coordinate(0, 0));
 
             var line = new List<Coordinate>
             {
@@ -126,7 +126,7 @@ namespace PolylinesComparerTests
                 new Coordinate(15, 18),
                 new Coordinate(25, 25)
             };
-            var index = indexesService.GetLineSpatialIndexes(line);
+            var index = indexesService.GetLineSpatial2DIndexes(line);
 
             Assert.AreEqual(5, index.Count, "Неверное количество ячеек индекса");
             Assert.IsTrue(index.Any(sp => sp.Row == 0 && sp.Column == 0));
@@ -146,9 +146,9 @@ namespace PolylinesComparerTests
         ///     во всех комбинациях
         /// </remarks>
         [TestMethod]
-        public void ComplexIndexesTest()
+        public void ComplexIndexes2DTest()
         {
-            var indexesService = new LineSpatialIndexesService(10, new Coordinate(0, 0), false);
+            var indexesService = new LineSpatialIndexesService(10, new Coordinate(0, 0));
 
             #region Возрастает по OY интенсивнее, чем убывает по OX
 
@@ -157,7 +157,7 @@ namespace PolylinesComparerTests
                 new Coordinate(25, 5),
                 new Coordinate(5, 45)
             };
-            var index = indexesService.GetLineSpatialIndexes(line);
+            var index = indexesService.GetLineSpatial2DIndexes(line);
 
             Assert.AreEqual(7, index.Count, "Неверное количество ячеек индекса");
             Assert.IsTrue(index.Any(sp => sp.Row == 0 && sp.Column == 2));
@@ -177,7 +177,7 @@ namespace PolylinesComparerTests
                 new Coordinate(5, 5),
                 new Coordinate(5, 45)
             };
-            index = indexesService.GetLineSpatialIndexes(line);
+            index = indexesService.GetLineSpatial2DIndexes(line);
 
             Assert.AreEqual(5, index.Count, "Неверное количество ячеек индекса");
             Assert.IsTrue(index.Any(sp => sp.Row == 0 && sp.Column == 0));
@@ -195,7 +195,7 @@ namespace PolylinesComparerTests
                 new Coordinate(5, 5),
                 new Coordinate(25, 45)
             };
-            index = indexesService.GetLineSpatialIndexes(line);
+            index = indexesService.GetLineSpatial2DIndexes(line);
 
             Assert.AreEqual(7, index.Count, "Неверное количество ячеек индекса");
             Assert.IsTrue(index.Any(sp => sp.Row == 0 && sp.Column == 0));
@@ -215,7 +215,7 @@ namespace PolylinesComparerTests
                 new Coordinate(25, 45),
                 new Coordinate(5, 5)
             };
-            index = indexesService.GetLineSpatialIndexes(line);
+            index = indexesService.GetLineSpatial2DIndexes(line);
 
             Assert.AreEqual(7, index.Count, "Неверное количество ячеек индекса");
             Assert.IsTrue(index.Any(sp => sp.Row == 0 && sp.Column == 0));
@@ -235,7 +235,7 @@ namespace PolylinesComparerTests
                 new Coordinate(5, 45),
                 new Coordinate(5, 5)
             };
-            index = indexesService.GetLineSpatialIndexes(line);
+            index = indexesService.GetLineSpatial2DIndexes(line);
 
             Assert.AreEqual(5, index.Count, "Неверное количество ячеек индекса");
             Assert.IsTrue(index.Any(sp => sp.Row == 0 && sp.Column == 0));
@@ -253,7 +253,7 @@ namespace PolylinesComparerTests
                 new Coordinate(5, 45),
                 new Coordinate(25, 5)
             };
-            index = indexesService.GetLineSpatialIndexes(line);
+            index = indexesService.GetLineSpatial2DIndexes(line);
 
             Assert.AreEqual(7, index.Count, "Неверное количество ячеек индекса");
             Assert.IsTrue(index.Any(sp => sp.Row == 0 && sp.Column == 2));
@@ -273,7 +273,7 @@ namespace PolylinesComparerTests
                 new Coordinate(5, 5),
                 new Coordinate(45, 25)
             };
-            index = indexesService.GetLineSpatialIndexes(line);
+            index = indexesService.GetLineSpatial2DIndexes(line);
 
             Assert.AreEqual(7, index.Count, "Неверное количество ячеек индекса");
             Assert.IsTrue(index.Any(sp => sp.Row == 0 && sp.Column == 0));
@@ -293,7 +293,7 @@ namespace PolylinesComparerTests
                 new Coordinate(5, 5),
                 new Coordinate(45, 5)
             };
-            index = indexesService.GetLineSpatialIndexes(line);
+            index = indexesService.GetLineSpatial2DIndexes(line);
 
             Assert.AreEqual(5, index.Count, "Неверное количество ячеек индекса");
             Assert.IsTrue(index.Any(sp => sp.Row == 0 && sp.Column == 0));
@@ -311,7 +311,7 @@ namespace PolylinesComparerTests
                 new Coordinate(5, 25),
                 new Coordinate(45, 5)
             };
-            index = indexesService.GetLineSpatialIndexes(line);
+            index = indexesService.GetLineSpatial2DIndexes(line);
 
             Assert.AreEqual(7, index.Count, "Неверное количество ячеек индекса");
             Assert.IsTrue(index.Any(sp => sp.Row == 2 && sp.Column == 0));
@@ -331,7 +331,7 @@ namespace PolylinesComparerTests
                 new Coordinate(45, 5),
                 new Coordinate(5, 25)
             };
-            index = indexesService.GetLineSpatialIndexes(line);
+            index = indexesService.GetLineSpatial2DIndexes(line);
 
             Assert.AreEqual(7, index.Count, "Неверное количество ячеек индекса");
             Assert.IsTrue(index.Any(sp => sp.Row == 2 && sp.Column == 0));
@@ -351,7 +351,7 @@ namespace PolylinesComparerTests
                 new Coordinate(45, 5),
                 new Coordinate(5, 5)
             };
-            index = indexesService.GetLineSpatialIndexes(line);
+            index = indexesService.GetLineSpatial2DIndexes(line);
 
             Assert.AreEqual(5, index.Count, "Неверное количество ячеек индекса");
             Assert.IsTrue(index.Any(sp => sp.Row == 0 && sp.Column == 0));
@@ -369,7 +369,7 @@ namespace PolylinesComparerTests
                 new Coordinate(45, 25),
                 new Coordinate(5, 5)
             };
-            index = indexesService.GetLineSpatialIndexes(line);
+            index = indexesService.GetLineSpatial2DIndexes(line);
 
             Assert.AreEqual(7, index.Count, "Неверное количество ячеек индекса");
             Assert.IsTrue(index.Any(sp => sp.Row == 0 && sp.Column == 0));
@@ -388,16 +388,16 @@ namespace PolylinesComparerTests
         ///     когда граничные точки которой, лежат прямо на сетке пространственного индекса
         /// </summary>
         [TestMethod]
-        public void PointOnGridIndexesTest()
+        public void PointOnGridIndexes2DTest()
         {
-            var indexesService = new LineSpatialIndexesService(10, new Coordinate(0, 0), false);
+            var indexesService = new LineSpatialIndexesService(10, new Coordinate(0, 0));
 
             var line = new List<Coordinate>
             {
                 new Coordinate(10, 5),
                 new Coordinate(20, 5)
             };
-            var index = indexesService.GetLineSpatialIndexes(line);
+            var index = indexesService.GetLineSpatial2DIndexes(line);
 
             Assert.AreEqual(3, index.Count, "Неверное количество ячеек индекса");
             Assert.IsTrue(index.Any(sp => sp.Row == 0 && sp.Column == 0));
@@ -411,16 +411,16 @@ namespace PolylinesComparerTests
         ///     сетки пространственного индекса
         /// </summary>
         [TestMethod]
-        public void PointOnCrossbreedIndexesTest()
+        public void PointOnCrossbreedIndexes2DTest()
         {
-            var indexesService = new LineSpatialIndexesService(10, new Coordinate(0, 0), false);
+            var indexesService = new LineSpatialIndexesService(10, new Coordinate(0, 0));
 
             var line = new List<Coordinate>
             {
                 new Coordinate(10, 10),
                 new Coordinate(30, 30)
             };
-            var index = indexesService.GetLineSpatialIndexes(line);
+            var index = indexesService.GetLineSpatial2DIndexes(line);
 
             Assert.AreEqual(10, index.Count, "Неверное количество ячеек индекса");
             Assert.IsTrue(index.Any(sp => sp.Row == 0 && sp.Column == 0));

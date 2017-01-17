@@ -17,34 +17,25 @@ namespace PolylinesComparer
         /// <param name="precision">Шаг сетки</param>
         /// <param name="compliance">Ожидаемая степень соответствия, где 1 - полное соответствие</param>
         /// <returns>ИСТИНА - если линии совпали</returns>
-        public bool LaneCompare(List<Coordinate> firstLine, List<Coordinate> secondLine, double precision, double compliance)
+        public bool LaneCompare2D(List<Coordinate> firstLine, List<Coordinate> secondLine, double precision,
+            double compliance)
         {
             if (firstLine.Count == 0 && secondLine.Count == 0)
                 return true;
             if (firstLine.Count == 0 || secondLine.Count == 0)
                 return false;
 
-            //bool is3D = firstLine.HasH && secondLine.HasH;
-
             // Найти точку, которая станет началом координат
-            Coordinate origin;
             var unated = firstLine.Concat(secondLine).ToList();
             var minX = unated.Min(n => n.Lon);
             var minY = unated.Min(n => n.Lat);
-            /*if (is3D)
-            {
-                // Для трёхмерного пространства
-                var minZ = unated.Min(n => n.H);
-                origin = new Coordinate(minX, minY, minZ);
-            }
-            else*/
-                origin = new Coordinate(minX, minY);
+            var origin = new Coordinate(minX, minY);
 
             // Создание сервиса, которому выпала участь сравнивать эти линии
-            var comparer = new LineSpatialIndexesService(precision, origin, false);
+            var comparer = new LineSpatialIndexesService(precision, origin);
 
-            var firstIndex = comparer.GetLineSpatialIndexes(firstLine);
-            var lastIndex = comparer.GetLineSpatialIndexes(secondLine);
+            var firstIndex = comparer.GetLineSpatial2DIndexes(firstLine);
+            var lastIndex = comparer.GetLineSpatial2DIndexes(secondLine);
 
             var allColl = firstIndex.Count; // Общее количество различных элементов 
             var interColl = 0; // Количество элементов, которые есть в обоих множествах
@@ -56,9 +47,41 @@ namespace PolylinesComparer
                     interColl++;
             }
 
-            if ((double)interColl / allColl >= compliance)
+            return (double) interColl / allColl >= compliance;
+        }
+
+        public bool LaneCompare3D(List<Coordinate> firstLine, List<Coordinate> secondLine, double precision,
+            double compliance)
+        {
+            if (firstLine.Count == 0 && secondLine.Count == 0)
                 return true;
-            return false;
+            if (firstLine.Count == 0 || secondLine.Count == 0)
+                return false;
+
+            // Найти точку, которая станет началом координат
+            var unated = firstLine.Concat(secondLine).ToList();
+            var minX = unated.Min(n => n.Lon);
+            var minY = unated.Min(n => n.Lat);
+            var minZ = unated.Min(n => n.H);
+            var origin = new Coordinate(minX, minY, minZ);
+
+            // Создание сервиса, которому выпала участь сравнивать эти линии
+            var comparer = new LineSpatialIndexesService(precision, origin);
+
+            var firstIndex = comparer.GetLineSpatial3DIndexes(firstLine);
+            var lastIndex = comparer.GetLineSpatial3DIndexes(secondLine);
+
+            var allColl = firstIndex.Count; // Общее количество различных элементов 
+            var interColl = 0; // Количество элементов, которые есть в обоих множествах
+            foreach (var elem in firstIndex)
+            {
+                if (!lastIndex.Any(n => n.Column == elem.Column && n.Row == elem.Row && n.Layer == elem.Layer))
+                    allColl++;
+                else
+                    interColl++;
+            }
+
+            return (double) interColl / allColl >= compliance;
         }
     }
 }
