@@ -7,7 +7,7 @@ namespace PolylinesComparer
     /// <summary>
     /// Сравнение линий
     /// </summary>
-    class LaneComparerService
+    class LineComparerService
     {
         /// <summary>
         /// Сравнение двух линий
@@ -17,7 +17,7 @@ namespace PolylinesComparer
         /// <param name="precision">Шаг сетки</param>
         /// <param name="compliance">Ожидаемая степень соответствия, где 1 - полное соответствие</param>
         /// <returns>ИСТИНА - если линии совпали</returns>
-        public bool LaneCompare2D(List<Coordinate> firstLine, List<Coordinate> secondLine, double precision,
+        public bool LineCompare2D(List<Coordinate> firstLine, List<Coordinate> secondLine, double precision,
             double compliance)
         {
             if (firstLine.Count == 0 && secondLine.Count == 0)
@@ -44,7 +44,7 @@ namespace PolylinesComparer
         /// <param name="compliance">Ожидаемая степень соответствия, где 1 - полное соответствие</param>
         /// <param name="origin">Точка начала координат</param>
         /// <returns>ИСТИНА - если линии совпали</returns>
-        public bool LaneCompare2D(List<Coordinate> firstLine, List<Coordinate> secondLine, double precision,
+        public bool LineCompare2D(List<Coordinate> firstLine, List<Coordinate> secondLine, double precision,
             double compliance, Coordinate origin)
         {
             if (firstLine.Count == 0 && secondLine.Count == 0)
@@ -64,7 +64,7 @@ namespace PolylinesComparer
         /// <param name="precision">Шаг сетки</param>
         /// <param name="compliance">Ожидаемая степень соответствия, где 1 - полное соответствие</param>
         /// <returns>ИСТИНА - если линии совпали</returns>
-        public bool LaneCompare3D(List<Coordinate> firstLine, List<Coordinate> secondLine, double precision,
+        public bool LineCompare3D(List<Coordinate> firstLine, List<Coordinate> secondLine, double precision,
             double compliance)
         {
             if (firstLine.Count == 0 && secondLine.Count == 0)
@@ -92,7 +92,7 @@ namespace PolylinesComparer
         /// <param name="compliance">Ожидаемая степень соответствия, где 1 - полное соответствие</param>
         /// <param name="origin">Точка начала координат</param>
         /// <returns>ИСТИНА - если линии совпали</returns>
-        public bool LaneCompare3D(List<Coordinate> firstLine, List<Coordinate> secondLine, double precision,
+        public bool LineCompare3D(List<Coordinate> firstLine, List<Coordinate> secondLine, double precision,
             double compliance, Coordinate origin)
         {
             if (firstLine.Count == 0 && secondLine.Count == 0)

@@ -39,7 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LaneComparerService.cs" />
+    <Compile Include="LineComparerService.cs" />
     <Compile Include="LineSpatialIndexesService.cs" />
     <Compile Include="Model\Coordinate.cs" />
     <Compile Include="Model\GridCell.cs" />
