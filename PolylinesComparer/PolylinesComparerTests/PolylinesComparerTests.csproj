@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="LineSpatialIndexes2DTests.cs" />
     <Compile Include="LineSpatialIndexes3DTests.cs" />
+    <Compile Include="NegativeIndexTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

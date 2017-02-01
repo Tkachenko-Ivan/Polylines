@@ -260,9 +260,8 @@ namespace PolylinesComparer
 
         private void AddToResult(int column, int row, List<GridCell> result)
         {
-            if (column != -1 && row != -1)
-                if (!result.Any(n => n.Column == column && n.Row == row))
-                    result.Add(new GridCell(row, column));
+            if (!result.Any(n => n.Column == column && n.Row == row))
+                result.Add(new GridCell(row, column));
         }
 
         private void AddToResult(List<GridCell> subResult, List<GridCell> result)
@@ -273,9 +272,8 @@ namespace PolylinesComparer
 
         private void AddToResult(int column, int row, int layer, List<GridCell> result)
         {
-            if (column != -1 && row != -1 && layer != -1)
-                if (!result.Any(n => n.Column == column && n.Row == row && n.Layer == layer))
-                    result.Add(new GridCell(row, column, layer));
+            if (!result.Any(n => n.Column == column && n.Row == row && n.Layer == layer))
+                result.Add(new GridCell(row, column, layer));
         }
 
         /// <summary>

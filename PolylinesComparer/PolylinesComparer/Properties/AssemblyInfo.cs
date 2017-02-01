@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle("PolylinesComparer")]
 [assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("Pre-alpha")]
+[assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("PolylinesComparer")]
 [assembly: AssemblyCopyright("")]
