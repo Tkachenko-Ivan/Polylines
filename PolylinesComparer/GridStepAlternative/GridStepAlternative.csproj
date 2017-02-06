@@ -70,13 +70,21 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Calculation\Calculation.cs" />
+    <Compile Include="Infrastructure\IСhainService.cs" />
     <Compile Include="Infrastructure\IEntityService.cs" />
+    <Compile Include="Infrastructure\INodeService.cs" />
+    <Compile Include="Infrastructure\IEdgeService.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\Coordinate.cs" />
+    <Compile Include="Model\Entity.cs" />
+    <Compile Include="Model\Node.cs" />
+    <Compile Include="Model\Сhain.cs" />
+    <Compile Include="Model\Edge.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -103,7 +111,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DataService\" />
-    <Folder Include="Model\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

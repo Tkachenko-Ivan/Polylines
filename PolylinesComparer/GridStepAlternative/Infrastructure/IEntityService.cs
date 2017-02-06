@@ -1,4 +1,7 @@
-﻿namespace GridStepAlternative.Infrastructure
+﻿using System.Collections.Generic;
+using GridStepAlternative.Model;
+
+namespace GridStepAlternative.Infrastructure
 {
     /// <summary>
     /// Контракт для получения списка сущностей - графов
@@ -8,6 +11,6 @@
     /// </remarks>
     public interface IEntityService
     {
-        void GetEntitys();
+        List<Entity> GetEntitys();
     }
 }
