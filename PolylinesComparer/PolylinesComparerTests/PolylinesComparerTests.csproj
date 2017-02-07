@@ -51,6 +51,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="IndexesNumberTests.cs" />
     <Compile Include="LineSpatialIndexes2DTests.cs" />
     <Compile Include="LineSpatialIndexes3DTests.cs" />
     <Compile Include="NegativeIndexTests.cs" />

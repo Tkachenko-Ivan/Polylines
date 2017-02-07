@@ -6,7 +6,7 @@ namespace PolylinesComparer
     /// <summary>
     /// Подсчёт количества одинаковых линий
     /// </summary>
-    public class IndexesNumber
+    public class IndexesNumberService
     {
         /// <summary>
         /// Группирует линии по соответствию пространственных индексов (строит кластеры) и подсчитывает количество кластеров
@@ -101,6 +101,9 @@ namespace PolylinesComparer
                 var excludeSubIndex = new List<int>();
                 for (int j = i + 1; j < count; j++)
                 {
+                    if (excludeIndex.Contains(j))
+                        continue;
+
                     var maskC = BitMaskOfRow(matrix, j, excludeIndex);
                     if (mask == maskC)
                         excludeSubIndex.Add(j);
