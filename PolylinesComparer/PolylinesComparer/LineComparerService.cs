@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using PolylinesComparer.Model;
 using System.Linq;
 
