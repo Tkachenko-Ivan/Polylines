@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using GridStepAlternative.DataService;
 using LiveCharts;
 using LiveCharts.Wpf;
 
@@ -30,5 +31,18 @@ namespace GridStepAlternative
 
             Labels = new[] { "1", "5", "7", "9", "12" };
         }
+
+        private void CalculateButtonClick(object sender, RoutedEventArgs e)
+        {
+            // TODO: Добавьте сюда реализации сервисов данных
+            var calc = new Calculation.Calculation(new NodeService(), new СhainService(), new EntityService(),
+                new EdgeService());
+
+            foreach (var map in calc.GetMaps())
+            {
+                
+            }
+        }
     }
+
 }

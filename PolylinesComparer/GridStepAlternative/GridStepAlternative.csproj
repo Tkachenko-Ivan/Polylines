@@ -70,6 +70,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Calculation\Calculation.cs" />
+    <Compile Include="DataService\EdgeService.cs" />
+    <Compile Include="DataService\EntityService.cs" />
+    <Compile Include="DataService\NodeService.cs" />
+    <Compile Include="DataService\СhainService.cs" />
     <Compile Include="Infrastructure\IСhainService.cs" />
     <Compile Include="Infrastructure\IEntityService.cs" />
     <Compile Include="Infrastructure\INodeService.cs" />
@@ -109,9 +113,7 @@
     </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DataService\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

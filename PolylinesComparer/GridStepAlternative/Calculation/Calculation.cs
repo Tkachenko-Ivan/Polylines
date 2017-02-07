@@ -37,7 +37,7 @@ namespace GridStepAlternative.Calculation
         private List<Edge>[,] GetEntityMap(int entityId)
         {
             var nodes = _nodeService.GetNodesByEntity(entityId);
-            var сhains = _сhainService.GetEdgeByEntity(entityId);
+            var сhains = _сhainService.GetСhainByEntity(entityId);
 
             // Заполнение матрицы связности
             var result = new List<Edge>[nodes.Count, nodes.Count];

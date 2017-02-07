@@ -7,8 +7,13 @@
         mc:Ignorable="d"
         Title="Подбор размера ячейки" 
         Height="350" Width="525">
-    
+
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        
         <lvc:CartesianChart Series="{Binding SeriesCollection}"  >
             <lvc:CartesianChart.AxisY>
                 <lvc:Axis Title="Количество путей" />
@@ -17,5 +22,9 @@
                 <lvc:Axis Title="Размер ячейки (м)" Labels="{Binding Labels}" />
             </lvc:CartesianChart.AxisX>
         </lvc:CartesianChart>
+        
+        <StackPanel Grid.Column="1">
+            <Button Content="Расчёт" Margin="3" Click="CalculateButtonClick"/>
+        </StackPanel>
     </Grid>
 </Window>
