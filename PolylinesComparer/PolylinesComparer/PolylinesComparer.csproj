@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IndexesNumber.cs" />
     <Compile Include="LineComparerService.cs" />
     <Compile Include="LineSpatialIndexesService.cs" />
     <Compile Include="Model\Coordinate.cs" />
