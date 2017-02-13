@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using PolylinesComparer.Model;
 
 namespace PolylinesComparer
@@ -32,7 +35,8 @@ namespace PolylinesComparer
             return Distaff(matrix);
         }
 
-        public int DifferentIndexesNumber2D(List<List<Coordinate>> lines, double precision, double compliance, Coordinate origin)
+        public int DifferentIndexesNumber2D(List<List<Coordinate>> lines, double precision, double compliance,
+            Coordinate origin)
         {
             // Заполнение матрицы
             bool[,] matrix = new bool[lines.Count, lines.Count];
@@ -41,7 +45,8 @@ namespace PolylinesComparer
                 matrix[i, i] = true;
                 for (int j = i + 1; j < lines.Count; j++)
                 {
-                    matrix[i, j] = new LineComparerService().LineCompare2D(lines[i], lines[j], precision, compliance, origin);
+                    matrix[i, j] = new LineComparerService().LineCompare2D(lines[i], lines[j], precision, compliance,
+                        origin);
                     matrix[j, i] = matrix[i, j];
                 }
             }
@@ -66,7 +71,8 @@ namespace PolylinesComparer
             return Distaff(matrix);
         }
 
-        public int DifferentIndexesNumber3D(List<List<Coordinate>> lines, double precision, double compliance, Coordinate origin)
+        public int DifferentIndexesNumber3D(List<List<Coordinate>> lines, double precision, double compliance,
+            Coordinate origin)
         {
             // Заполнение матрицы
             bool[,] matrix = new bool[lines.Count, lines.Count];
@@ -75,7 +81,8 @@ namespace PolylinesComparer
                 matrix[i, i] = true;
                 for (int j = i + 1; j < lines.Count; j++)
                 {
-                    matrix[i, j] = new LineComparerService().LineCompare3D(lines[i], lines[j], precision, compliance, origin);
+                    matrix[i, j] = new LineComparerService().LineCompare3D(lines[i], lines[j], precision, compliance,
+                        origin);
                     matrix[j, i] = matrix[i, j];
                 }
             }
@@ -85,45 +92,71 @@ namespace PolylinesComparer
 
         private int Distaff(bool[,] matrix)
         {
-            var count = matrix.GetLength(0);
+            var groups = new List<List<int>>();
 
-            int number = 0;
-            var excludeIndex = new List<int>();
+            var count = matrix.GetLength(0);
             for (int i = 0; i < count; i++)
             {
-                if (excludeIndex.Contains(i))
-                    continue;
+                // Если объект порождает группу из самого себя, то single - ИСТИНА
+                bool single = true;
 
-                number++;
-
-                var mask = BitMaskOfRow(matrix, i, excludeIndex);
-
-                var excludeSubIndex = new List<int>();
-                for (int j = i + 1; j < count; j++)
+                var newGroups = new List<List<int>>();
+                // Пытаемся добавить объект в существующие группы
+                foreach (var group in groups)
                 {
-                    if (excludeIndex.Contains(j))
-                        continue;
+                    var newGroup = new List<int>();
+                    foreach (var element in group)
+                        if (matrix[i, element])
+                            newGroup.Add(element);
 
-                    var maskC = BitMaskOfRow(matrix, j, excludeIndex);
-                    if (mask == maskC)
-                        excludeSubIndex.Add(j);
+                    if (newGroup.Count == group.Count)
+                    {
+                        // Добавить элемент в текущую группу
+                        group.Add(i);
+                        single = false;
+                    }
+                    else if (newGroup.Any())
+                    {
+                        // Элемент порождает новую группу из части элементов текущей
+                        newGroup.Add(i);
+                        newGroups.Add(newGroup);
+                        single = false;
+                    }
                 }
 
-                excludeIndex.Add(i);
-                excludeIndex.AddRange(excludeSubIndex);
+                if (single)
+                    // Элемент не был добавлен ни к одной группе
+                    groups.Add(new List<int> {i});
+                else
+                    for (int j = 0; j < newGroups.Count; j++)
+                    {
+                        bool unique = true;
+
+                        // Проверить, является ли порождённая группа подмножеством другой порождённой группы
+                        for (int l = j + 1; l < newGroups.Count; l++)
+                            if (newGroups[j].Intersect(newGroups[l]).Count() == newGroups[j].Count)
+                            {
+                                unique = false;
+                                break;
+                            }
+
+                        if (!unique)
+                            continue;
+
+                        // Проверить, является ли порождённая группа подмножеством другой группы из списка
+                        foreach (var existing in groups)
+                            if (newGroups[j].Intersect(existing).Count() == newGroups[j].Count)
+                            {
+                                unique = false;
+                                break;
+                            }
+
+                        // Группа прошла все проверки - добавить в список
+                        if (unique)
+                            groups.Add(newGroups[j]);
+                    }
             }
-
-            return number;
-        }
-
-        private string BitMaskOfRow(bool[,] matrix, int ri, List<int> excludeIndex)
-        {
-            var count = matrix.GetLength(0);
-            var result = "";
-            for (int j = 0; j < count; j++)
-                if (!excludeIndex.Contains(j))
-                    result += matrix[ri, j] ? "1" : "0";
-            return result;
+            return groups.Count;
         }
     }
 }
