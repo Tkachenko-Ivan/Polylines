@@ -257,7 +257,6 @@ namespace PolylinesComparer
             }
         }
 
-
         private void AddToResult(int column, int row, List<GridCell> result)
         {
             if (!result.Any(n => n.Column == column && n.Row == row))

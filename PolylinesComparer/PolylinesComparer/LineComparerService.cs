@@ -112,12 +112,12 @@ namespace PolylinesComparer
 
             var allColl = firstIndex.Count; // Общее количество различных элементов 
             var interColl = 0; // Количество элементов, которые есть в обоих множествах
-            foreach (var elem in firstIndex)
+            foreach (var elem in lastIndex)
             {
-                if (!lastIndex.Any(n => n.Column == elem.Column && n.Row == elem.Row))
-                    allColl++;
-                else
+                if (firstIndex.Any(n => n.Column == elem.Column && n.Row == elem.Row))
                     interColl++;
+                else
+                    allColl++;
             }
             return (double)interColl / allColl;
         }
@@ -129,12 +129,12 @@ namespace PolylinesComparer
 
             var allColl = firstIndex.Count; // Общее количество различных элементов 
             var interColl = 0; // Количество элементов, которые есть в обоих множествах
-            foreach (var elem in firstIndex)
+            foreach (var elem in lastIndex)
             {
-                if (!lastIndex.Any(n => n.Column == elem.Column && n.Row == elem.Row && n.Layer == elem.Layer))
-                    allColl++;
-                else
+                if (firstIndex.Any(n => n.Column == elem.Column && n.Row == elem.Row && n.Layer == elem.Layer))
                     interColl++;
+                else
+                    allColl++;
             }
             return (double)interColl / allColl;
         }

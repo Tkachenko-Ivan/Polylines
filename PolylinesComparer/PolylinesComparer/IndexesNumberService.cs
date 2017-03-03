@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using PolylinesComparer.Model;
 
 namespace PolylinesComparer
@@ -90,6 +88,11 @@ namespace PolylinesComparer
             return Distaff(matrix);
         }
 
+        /// <summary>
+        /// Рассортровка объектов по множествам
+        /// </summary>
+        /// <param name="matrix">Матрица отношений между объектами</param>
+        /// <returns>количество множеств</returns>
         private int Distaff(bool[,] matrix)
         {
             var groups = new List<List<int>>();
