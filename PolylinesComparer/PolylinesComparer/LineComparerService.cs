@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
+﻿using System;
+using System.Collections.Generic;
 using PolylinesComparer.Model;
 using System.Linq;
 
@@ -8,7 +8,7 @@ namespace PolylinesComparer
     /// <summary>
     /// Сравнение линий
     /// </summary>
-    class LineComparerService
+    public class LineComparerService
     {
         /// <summary>
         /// Сравнение двух линий
@@ -21,6 +21,9 @@ namespace PolylinesComparer
         public bool LineCompare2D(List<Coordinate> firstLine, List<Coordinate> secondLine, double precision,
             double compliance)
         {
+            if (!(compliance > 0 && compliance <=1))
+                throw new Exception($"Степень соответствия должна принимать значение в диапазоне (0;1], актуальное значение {compliance}");
+
             if (firstLine.Count == 0 && secondLine.Count == 0)
                 return true;
             if (firstLine.Count == 0 || secondLine.Count == 0)
@@ -48,6 +51,9 @@ namespace PolylinesComparer
         public bool LineCompare2D(List<Coordinate> firstLine, List<Coordinate> secondLine, double precision,
             double compliance, Coordinate origin)
         {
+            if (!(compliance > 0 && compliance <= 1))
+                throw new Exception($"Степень соответствия должна принимать значение в диапазоне (0;1], актуальное значение {compliance}");
+
             if (firstLine.Count == 0 && secondLine.Count == 0)
                 return true;
             if (firstLine.Count == 0 || secondLine.Count == 0)
@@ -68,6 +74,9 @@ namespace PolylinesComparer
         public bool LineCompare3D(List<Coordinate> firstLine, List<Coordinate> secondLine, double precision,
             double compliance)
         {
+            if (!(compliance > 0 && compliance <= 1))
+                throw new Exception($"Степень соответствия должна принимать значение в диапазоне (0;1], актуальное значение {compliance}");
+
             if (firstLine.Count == 0 && secondLine.Count == 0)
                 return true;
             if (firstLine.Count == 0 || secondLine.Count == 0)
@@ -96,6 +105,9 @@ namespace PolylinesComparer
         public bool LineCompare3D(List<Coordinate> firstLine, List<Coordinate> secondLine, double precision,
             double compliance, Coordinate origin)
         {
+            if (!(compliance > 0 && compliance <= 1))
+                throw new Exception($"Степень соответствия должна принимать значение в диапазоне (0;1], актуальное значение {compliance}");
+
             if (firstLine.Count == 0 && secondLine.Count == 0)
                 return true;
             if (firstLine.Count == 0 || secondLine.Count == 0)

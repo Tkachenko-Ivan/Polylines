@@ -23,6 +23,9 @@ namespace PolylinesComparer
         /// <param name="origin">Начало координат</param>
         public LineSpatialIndexesService(double precision, Coordinate origin)
         {
+            if (precision == 0)
+                throw new Exception("Шаг сетки не должен быть 0");
+
             _precision = precision;
             _origin = origin;
         }
