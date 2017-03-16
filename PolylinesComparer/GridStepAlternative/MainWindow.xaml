@@ -70,7 +70,12 @@
                          DataObject.Pasting="TextBoxPasting"/>
 
             </Grid>
-            <Button Name="Calculate" Content="Расчёт" Margin="3,5" Click="CalculateButtonClick"/>
+
+            <CheckBox Name="AllCompare" IsChecked="True" Margin="3,5,3,3">
+                <TextBox TextWrapping="Wrap">Сравнивать всех со всеми</TextBox>
+            </CheckBox>
+            
+            <Button Name="Calculate" Content="Расчёт" Margin="3,3" Click="CalculateButtonClick"/>
         </StackPanel>
     </Grid>
 </Window>

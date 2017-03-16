@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Input;
 using Avalon.Windows.Dialogs;
 using GridStepAlternative.DataService;
@@ -104,12 +105,14 @@ namespace GridStepAlternative
 
                 int fromValue = 0, toValue = 0, stepValue = 0;
                 string folder = "";
+                bool allCompare = true;
                 Dispatcher.Invoke(new Action(() =>
                 {
                     fromValue = FromValue;
                     toValue = ToValue;
                     stepValue = StepValue;
                     folder = FolderPath.Text;
+                    allCompare = AllCompare.IsChecked.Value;
                 }));
 
                 // TODO: Можно добавить сюда свои реализации сервисов данных: INodeService, IСhainService, IEntityService, IEdgeService
@@ -136,32 +139,84 @@ namespace GridStepAlternative
                         SeriesCollection.Add(line);
                     }));
 
-                    // Получить список всех рёбер
-                    var collection = new List<List<Coordinate>>();
-                    // Обход всех рёбер сущности
                     var count = map.Edges.GetLength(0);
-                    for (int i = 0; i < count; i++)
-                    for (int j = 0; j < count; j++)
-                        if (map.Edges[i, j] != null)
-                            collection.AddRange(map.Edges[i, j].Select(edge => edge.Coordinates).ToList());
-
-                    // Изменение размеров ячеек индексной сетки
-                    for (int grid = fromValue; grid <= toValue; grid += stepValue)
+                    if (allCompare)
                     {
-                        var center = new Coordinate(map.Entity.Center.Lon - grid * 0.5,
-                            map.Entity.Center.Lat - grid * 0.5);
+                        // Сравнивать все рёбра со всеми
 
-                        // Определить количество уникальных рёбер
-                        var result = grid == 0
-                            ? collection.Count
-                            : numberService.DifferentIndexesNumber2D(collection, grid, 1,
-                                center);
-                        Dispatcher.Invoke(new Action(() =>
+                        // Получить список всех рёбер
+                        var collection = new List<List<Coordinate>>();
+                        // Обход всех рёбер сущности
+                        for (int i = 0; i < count; i++)
+                        for (int j = 0; j < count; j++)
+                            if (map.Edges[i, j] != null)
+                                collection.AddRange(map.Edges[i, j].Select(edge => edge.Coordinates).ToList());
+
+                        // Изменение размеров ячеек индексной сетки
+                        for (int grid = fromValue; grid <= toValue; grid += stepValue)
                         {
-                            line.Values.Add(result);
-                        }));
+                            var center = new Coordinate(map.Entity.Center.Lon - grid * 0.5,
+                                map.Entity.Center.Lat - grid * 0.5);
 
-                        log.Trace($"Ячейка {grid} - результат {result}");
+                            // Определить количество уникальных рёбер
+                            var result = grid == 0
+                                ? collection.Count
+                                : numberService.DifferentIndexesNumber2D(collection, grid, 1,
+                                    center);
+                            Dispatcher.Invoke(new Action(() =>
+                            {
+                                line.Values.Add(result);
+                            }));
+
+                            log.Trace($"Ячейка {grid} - результат {result}");
+                        }
+                    }
+                    else
+                    {
+                        // Сравнивать только те рёбра, которые связывают одинаковые вершины
+
+                        for (int grid = fromValue; grid <= toValue; grid += stepValue)
+                        {
+                            var result = 0;
+                            for (int i = 0; i < count; i++)
+                            for (int j = 0; j < count; j++)
+                                if (map.Edges[i, j] != null)
+                                {
+                                    if (map.Edges[i, j].Count == 1)
+                                        result++;
+                                    else if (grid == 0)
+                                        result += map.Edges[i, j].Count;
+                                    else
+                                    {
+                                        var collection = new List<List<Coordinate>>();
+                                        double minX = 0, minY = 0;
+                                        foreach (var edges in map.Edges[i, j])
+                                        {
+                                            collection.Add(edges.Coordinates);
+
+                                            var cMinX = edges.Coordinates.Select(c => c.Lon).Min();
+                                            var cMinY = edges.Coordinates.Select(c => c.Lat).Min();
+                                            minX = cMinX < minX ? cMinX : minX;
+                                            minY = cMinY < minY ? cMinY : minY;
+                                        }
+                                        var collect = collection.SelectMany(c => c);
+                                            minX = collection.SelectMany(c => c).Min(c => c.Lon);
+                                            minY = collection.SelectMany(c => c).Min(c => c.Lat);
+                                            var center = new Coordinate(minX, minY);
+
+                                       
+
+                                        result += numberService.DifferentIndexesNumber2D(collection, grid, 1, center);
+                                    }
+                                }
+
+                            Dispatcher.Invoke(new Action(() =>
+                            {
+                                line.Values.Add(result);
+                            }));
+
+                            log.Trace($"Ячейка {grid} - результат {result}");
+                        }
                     }
                 }
             };
