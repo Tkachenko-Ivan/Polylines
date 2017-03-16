@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <!-- XML Schema Generated from XML Document on Thu Mar 16 2017 09:18:27 GMT+0500 -->
+  <!-- with XmlGrid.net Free Online Service http://xmlgrid.net -->
+  <xs:element name="ArrayOfEntity">
+    <xs:annotation>
+      <xs:documentation>Список графов (сущностей)</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Entity" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation>Описание графа</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" type="xs:int"></xs:element>
+              <xs:element name="Name" type="xs:string"></xs:element>
+              <xs:element name="Center">
+                <xs:complexType>
+                  <xs:annotation>
+                    <xs:documentation>Географический/геометрический центр графа</xs:documentation>
+                  </xs:annotation>
+                  <xs:sequence>
+                    <xs:element name="Lon" type="xs:string">
+                      <xs:annotation>
+                        <xs:documentation>Координата по OX</xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Lat" type="xs:string">
+                      <xs:annotation>
+                        <xs:documentation>Координата по OY</xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Nodes">
+                <xs:annotation>
+                  <xs:documentation>Список узлов (вершин) графа</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Node" minOccurs="2" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="Id" type="xs:int"></xs:element>
+                          <xs:element name="Name" type="xs:string"></xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="xmlns:xsi" type="xs:string"></xs:attribute>
+      <xs:attribute name="xmlns:xsd" type="xs:string"></xs:attribute>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

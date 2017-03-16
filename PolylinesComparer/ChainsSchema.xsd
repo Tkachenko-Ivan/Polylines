@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <!-- XML Schema Generated from XML Document on Thu Mar 16 2017 09:25:45 GMT+0500 -->
+  <!-- with XmlGrid.net Free Online Service http://xmlgrid.net -->
+  <xs:element name="ArrayOfСhain">
+    <xs:annotation>
+      <xs:documentation>Список цепочек (маршрутов) последовательно соединяющих некоторые узлы графа</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Сhain" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation>Цепочка - связанная последовательность рёбер</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" type="xs:int"></xs:element>
+              <xs:element name="Name" type="xs:string"></xs:element>
+              <xs:element name="Edges">
+                <xs:annotation>
+                  <xs:documentation>Список сегментов цепочки</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Edge" maxOccurs="unbounded">
+                      <xs:annotation>
+                        <xs:documentation>Описание сегмента (ребра графа), каждый следующий сегмент начинается в том узле, в котором заканчивается предыдущий</xs:documentation>    
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="StartNode" type="xs:int">
+                            <xs:annotation>
+                              <xs:documentation>Идентификатор начального узла графа</xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="EndNode" type="xs:int">
+                            <xs:annotation>
+                              <xs:documentation>Идентификатор конечного узла графа</xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="Coordinates">
+                            <xs:annotation>
+                              <xs:documentation>Набор географичесих координта для отрисовки сегмента</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="Coordinate" minOccurs="2" maxOccurs="unbounded">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                      <xs:element name="Lon" type="xs:string">
+                                        <xs:annotation>
+                                          <xs:documentation>Координата по OX</xs:documentation>
+                                        </xs:annotation>
+                                      </xs:element>
+                                      <xs:element name="Lat" type="xs:string">
+                                        <xs:annotation>
+                                          <xs:documentation>Координата по OY</xs:documentation>
+                                        </xs:annotation>
+                                      </xs:element>
+                                    </xs:sequence>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="xmlns:xsi" type="xs:string"></xs:attribute>
+      <xs:attribute name="xmlns:xsd" type="xs:string"></xs:attribute>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

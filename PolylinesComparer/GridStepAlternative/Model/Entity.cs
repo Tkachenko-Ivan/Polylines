@@ -2,6 +2,9 @@
 
 namespace GridStepAlternative.Model
 {
+    /// <summary>
+    /// Информация о графе
+    /// </summary>
     public class Entity
     {
         public int Id;

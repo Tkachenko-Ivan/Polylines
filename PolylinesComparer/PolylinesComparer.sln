@@ -9,6 +9,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolylinesComparerTests", "P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GridStepAlternative", "GridStepAlternative\GridStepAlternative.csproj", "{5A577590-2AF7-4176-BC20-FA7B2B80BF9B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GridStep", "GridStep", "{5123F263-9F4C-4016-83FC-8D5F45F28740}"
+	ProjectSection(SolutionItems) = preProject
+		ChainsSchema.xsd = ChainsSchema.xsd
+		EntitysSchema.xsd = EntitysSchema.xsd
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +36,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5A577590-2AF7-4176-BC20-FA7B2B80BF9B} = {5123F263-9F4C-4016-83FC-8D5F45F28740}
 	EndGlobalSection
 EndGlobal
