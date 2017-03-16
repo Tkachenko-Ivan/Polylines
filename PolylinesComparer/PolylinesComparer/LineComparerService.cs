@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using PolylinesComparer.Model;
 using System.Linq;
 
@@ -8,6 +9,7 @@ namespace PolylinesComparer
     /// <summary>
     /// Сравнение линий
     /// </summary>
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public class LineComparerService
     {
         /// <summary>
@@ -31,12 +33,12 @@ namespace PolylinesComparer
 
             // Найти точку, которая станет началом координат
             var unated = firstLine.Concat(secondLine).ToList();
-            var minX = unated.Min(n => n.Lon) - precision * 0.1;
-            var minY = unated.Min(n => n.Lat) - precision * 0.1;
+            var minX = unated.Min(n => n.Lon) - precision * 0.5;
+            var minY = unated.Min(n => n.Lat) - precision * 0.5;
             var origin = new Coordinate(minX, minY);
 
             var comparer = new LineSpatialIndexesService(precision, origin);
-            return Compare2D(firstLine, secondLine, comparer) >= compliance;
+            return Compare2D(comparer.GetLineSpatial2DIndexes(firstLine), comparer.GetLineSpatial2DIndexes(secondLine), compliance);
         }
 
         /// <summary>
@@ -60,7 +62,7 @@ namespace PolylinesComparer
                 return false;
 
             var comparer = new LineSpatialIndexesService(precision, origin);
-            return Compare2D(firstLine, secondLine, comparer) >= compliance;
+            return Compare2D(comparer.GetLineSpatial2DIndexes(firstLine), comparer.GetLineSpatial2DIndexes(secondLine), compliance);
         }
 
         /// <summary>
@@ -84,13 +86,13 @@ namespace PolylinesComparer
 
             // Найти точку, которая станет началом координат
             var unated = firstLine.Concat(secondLine).ToList();
-            var minX = unated.Min(n => n.Lon) - precision * 0.1;
-            var minY = unated.Min(n => n.Lat) - precision * 0.1;
-            var minZ = unated.Min(n => n.H) - precision * 0.1;
+            var minX = unated.Min(n => n.Lon) - precision * 0.5;
+            var minY = unated.Min(n => n.Lat) - precision * 0.5;
+            var minZ = unated.Min(n => n.H) - precision * 0.5;
             var origin = new Coordinate(minX, minY, minZ);
 
             var comparer = new LineSpatialIndexesService(precision, origin);
-            return Compare3D(firstLine, secondLine, comparer) >= compliance;
+            return Compare3D(comparer.GetLineSpatial3DIndexes(firstLine), comparer.GetLineSpatial3DIndexes(secondLine), compliance);
         }
 
         /// <summary>
@@ -114,31 +116,44 @@ namespace PolylinesComparer
                 return false;
 
             var comparer = new LineSpatialIndexesService(precision, origin);
-            return Compare3D(firstLine, secondLine, comparer) >= compliance;
+            return Compare3D(comparer.GetLineSpatial3DIndexes(firstLine), comparer.GetLineSpatial3DIndexes(secondLine), compliance);
         }
 
-        private double Compare2D(List<Coordinate> firstLine, List<Coordinate> secondLine, LineSpatialIndexesService comparer)
+        /// <summary>
+        /// Проверяет на соответствие два пространственных индекса
+        /// </summary>
+        /// <param name="firstIndex">Первый индекс</param>
+        /// <param name="lastIndex">Второй индекс</param>
+        /// <param name="compliance">Ожидаемая степень соответствия, где 1 - полное соответствие</param>
+        /// <returns>ИСТИНА - если совпадение индексов больше или равно ожидаемому</returns>
+        public bool Compare2D(List<GridCell> firstIndex, List<GridCell> lastIndex, double compliance)
         {
-            var firstIndex = comparer.GetLineSpatial2DIndexes(firstLine);
-            var lastIndex = comparer.GetLineSpatial2DIndexes(secondLine);
-
-            var allColl = firstIndex.Count; // Общее количество различных элементов 
+            var allColl = firstIndex.Count; // Общее количество  элементов 
             var interColl = 0; // Количество элементов, которые есть в обоих множествах
             foreach (var elem in lastIndex)
             {
                 if (firstIndex.Any(n => n.Column == elem.Column && n.Row == elem.Row))
                     interColl++;
                 else
+                {
+                    if (compliance == 1)
+                        // Если необходимо полное совпадение, то оно больше не достижимо
+                        return false;
                     allColl++;
+                }
             }
-            return (double)interColl / allColl;
+            return (double)interColl / allColl >= compliance;
         }
 
-        private double Compare3D(List<Coordinate> firstLine, List<Coordinate> secondLine, LineSpatialIndexesService comparer)
+        /// <summary>
+        /// Проверяет на соответствие два трёхмерных пространственных индекса
+        /// </summary>
+        /// <param name="firstIndex">Первый индекс</param>
+        /// <param name="lastIndex">Второй индекс</param>
+        /// <param name="compliance">Ожидаемая степень соответствия, где 1 - полное соответствие</param>
+        /// <returns>ИСТИНА - если совпадение индексов больше или равно ожидаемому</returns>
+        public bool Compare3D(List<GridCell> firstIndex, List<GridCell> lastIndex, double compliance)
         {
-            var firstIndex = comparer.GetLineSpatial3DIndexes(firstLine);
-            var lastIndex = comparer.GetLineSpatial3DIndexes(secondLine);
-
             var allColl = firstIndex.Count; // Общее количество различных элементов 
             var interColl = 0; // Количество элементов, которые есть в обоих множествах
             foreach (var elem in lastIndex)
@@ -146,9 +161,14 @@ namespace PolylinesComparer
                 if (firstIndex.Any(n => n.Column == elem.Column && n.Row == elem.Row && n.Layer == elem.Layer))
                     interColl++;
                 else
+                {
+                    if (compliance == 1)
+                        // Если необходимо полное совпадение, то оно больше не достижимо
+                        return false;
                     allColl++;
+                }
             }
-            return (double)interColl / allColl;
+            return (double)interColl / allColl >= compliance;
         }
     }
 }

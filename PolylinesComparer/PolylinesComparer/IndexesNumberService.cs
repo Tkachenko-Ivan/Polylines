@@ -18,6 +18,8 @@ namespace PolylinesComparer
         /// <returns>Количество кластеров</returns>
         public int DifferentIndexesNumber2D(List<List<Coordinate>> lines, double precision, double compliance)
         {
+            var lineComparerService = new LineComparerService();
+
             // Заполнение матрицы
             bool[,] matrix = new bool[lines.Count, lines.Count];
             for (int i = 0; i < lines.Count; i++)
@@ -25,62 +27,7 @@ namespace PolylinesComparer
                 matrix[i, i] = true;
                 for (int j = i + 1; j < lines.Count; j++)
                 {
-                    matrix[i, j] = new LineComparerService().LineCompare2D(lines[i], lines[j], precision, compliance);
-                    matrix[j, i] = matrix[i, j];
-                }
-            }
-
-            return Distaff(matrix);
-        }
-
-        public int DifferentIndexesNumber2D(List<List<Coordinate>> lines, double precision, double compliance,
-            Coordinate origin)
-        {
-            // Заполнение матрицы
-            bool[,] matrix = new bool[lines.Count, lines.Count];
-            for (int i = 0; i < lines.Count; i++)
-            {
-                matrix[i, i] = true;
-                for (int j = i + 1; j < lines.Count; j++)
-                {
-                    matrix[i, j] = new LineComparerService().LineCompare2D(lines[i], lines[j], precision, compliance,
-                        origin);
-                    matrix[j, i] = matrix[i, j];
-                }
-            }
-
-            return Distaff(matrix);
-        }
-
-        public int DifferentIndexesNumber3D(List<List<Coordinate>> lines, double precision, double compliance)
-        {
-            // Заполнение матрицы
-            bool[,] matrix = new bool[lines.Count, lines.Count];
-            for (int i = 0; i < lines.Count; i++)
-            {
-                matrix[i, i] = true;
-                for (int j = i + 1; j < lines.Count; j++)
-                {
-                    matrix[i, j] = new LineComparerService().LineCompare3D(lines[i], lines[j], precision, compliance);
-                    matrix[j, i] = matrix[i, j];
-                }
-            }
-
-            return Distaff(matrix);
-        }
-
-        public int DifferentIndexesNumber3D(List<List<Coordinate>> lines, double precision, double compliance,
-            Coordinate origin)
-        {
-            // Заполнение матрицы
-            bool[,] matrix = new bool[lines.Count, lines.Count];
-            for (int i = 0; i < lines.Count; i++)
-            {
-                matrix[i, i] = true;
-                for (int j = i + 1; j < lines.Count; j++)
-                {
-                    matrix[i, j] = new LineComparerService().LineCompare3D(lines[i], lines[j], precision, compliance,
-                        origin);
+                    matrix[i, j] = lineComparerService.LineCompare2D(lines[i], lines[j], precision, compliance);
                     matrix[j, i] = matrix[i, j];
                 }
             }
@@ -89,7 +36,97 @@ namespace PolylinesComparer
         }
 
         /// <summary>
-        /// Рассортровка объектов по множествам
+        /// Группирует линии по соответствию пространственных индексов (строит кластеры) и подсчитывает количество кластеров
+        /// </summary>
+        /// <param name="lines">Список линий</param>
+        /// <param name="precision">Шаг сетки</param>
+        /// <param name="compliance">Ожидаемая степень соответствия, где 1 - полное соответствие</param>
+        /// <param name="origin">Начало координат</param>
+        /// <returns>Количество кластеров</returns>
+        public int DifferentIndexesNumber2D(List<List<Coordinate>> lines, double precision, double compliance,
+            Coordinate origin)
+        {
+            var lineComparerService = new LineComparerService();
+            var lineSpatialIndexesService = new LineSpatialIndexesService(precision, origin);
+
+            // Проиндексировать
+            var indexes = lines.Select(t => lineSpatialIndexesService.GetLineSpatial2DIndexes(t)).ToList();
+
+            // Заполнение матрицы
+            bool[,] matrix = new bool[lines.Count, lines.Count];
+            for (int i = 0; i < lines.Count; i++)
+            {
+                matrix[i, i] = true;
+                for (int j = i + 1; j < lines.Count; j++)
+                {
+                    matrix[i, j] = lineComparerService.Compare2D(indexes[i], indexes[j], compliance);
+                    matrix[j, i] = matrix[i, j];
+                }
+            }
+
+            return Distaff(matrix);
+        }
+
+        /// <summary>
+        /// Группирует линии по соответствию трёхмерных пространственных индексов (строит кластеры) и подсчитывает количество кластеров
+        /// </summary>
+        /// <param name="lines">Список линий</param>
+        /// <param name="precision">Шаг сетки</param>
+        /// <param name="compliance">Ожидаемая степень соответствия, где 1 - полное соответствие</param>
+        /// <returns>Количество кластеров</returns>
+        public int DifferentIndexesNumber3D(List<List<Coordinate>> lines, double precision, double compliance)
+        {
+            var lineComparerService = new LineComparerService();
+
+            // Заполнение матрицы
+            bool[,] matrix = new bool[lines.Count, lines.Count];
+            for (int i = 0; i < lines.Count; i++)
+            {
+                matrix[i, i] = true;
+                for (int j = i + 1; j < lines.Count; j++)
+                {
+                    matrix[i, j] = lineComparerService.LineCompare3D(lines[i], lines[j], precision, compliance);
+                    matrix[j, i] = matrix[i, j];
+                }
+            }
+
+            return Distaff(matrix);
+        }
+
+        /// <summary>
+        /// Группирует линии по соответствию трёхмерных пространственных индексов (строит кластеры) и подсчитывает количество кластеров
+        /// </summary>
+        /// <param name="lines">Список линий</param>
+        /// <param name="precision">Шаг сетки</param>
+        /// <param name="compliance">Ожидаемая степень соответствия, где 1 - полное соответствие</param>
+        /// <param name="origin">Начало координат</param>
+        /// <returns>Количество кластеров</returns>
+        public int DifferentIndexesNumber3D(List<List<Coordinate>> lines, double precision, double compliance,
+            Coordinate origin)
+        {
+            var lineComparerService = new LineComparerService();
+            var lineSpatialIndexesService = new LineSpatialIndexesService(precision, origin);
+
+            // Проиндексировать
+            var indexes = lines.Select(t => lineSpatialIndexesService.GetLineSpatial3DIndexes(t)).ToList();
+
+            // Заполнение матрицы
+            bool[,] matrix = new bool[lines.Count, lines.Count];
+            for (int i = 0; i < lines.Count; i++)
+            {
+                matrix[i, i] = true;
+                for (int j = i + 1; j < lines.Count; j++)
+                {
+                    matrix[i, j] = lineComparerService.Compare3D(indexes[i], indexes[j], compliance);
+                    matrix[j, i] = matrix[i, j];
+                }
+            }
+
+            return Distaff(matrix);
+        }
+
+        /// <summary>
+        /// Рассортировка объектов по множествам
         /// </summary>
         /// <param name="matrix">Матрица отношений между объектами</param>
         /// <returns>количество множеств</returns>

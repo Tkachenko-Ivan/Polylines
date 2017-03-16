@@ -11,8 +11,8 @@ namespace GridStepAlternative.Infrastructure
     /// </remarks>
     public interface INodeService
     {
-        List<Node> GetNodesByEntity(int entityId);
+        List<int> GetNodesByEntity(int entityId);
 
-        List<Node> GetNodesByChain(int chainId);
+        List<int> GetNodesByChain(int entityId, int chainId);
     }
 }

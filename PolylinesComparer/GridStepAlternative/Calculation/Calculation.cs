@@ -2,6 +2,7 @@
 using System.Linq;
 using GridStepAlternative.Infrastructure;
 using GridStepAlternative.Model;
+using PolylinesComparer.Model;
 
 namespace GridStepAlternative.Calculation
 {
@@ -26,12 +27,10 @@ namespace GridStepAlternative.Calculation
         /// <summary>
         /// Расчитывает матрицы связности для списка сущностей
         /// </summary>
-        public List<Entity> GetMaps()
+        public List<Map> GetMaps()
         {
-            var result = _entityService.GetEntitys();
-            foreach (var entity in result)
-                entity.Map = GetEntityMap(entity.Id);
-            return result;
+            var entitys = _entityService.GetEntitys();
+            return entitys.Select(entity => new Map {Entity = entity, Edges = GetEntityMap(entity.Id)}).ToList();
         }
 
         private List<Edge>[,] GetEntityMap(int entityId)
@@ -43,7 +42,7 @@ namespace GridStepAlternative.Calculation
             var result = new List<Edge>[nodes.Count, nodes.Count];
             foreach (var chain in сhains)
             {
-                var chainNodes = _nodeService.GetNodesByChain(chain.Id);
+                var chainNodes = _nodeService.GetNodesByChain(entityId, chain);
 
                 #region  Обход последовательно связанных узлов для заполнения матрицы связности
 
@@ -56,13 +55,13 @@ namespace GridStepAlternative.Calculation
                 for (int i = 0; i < chainNodes.Count; i++)
                 {
                     // Найдём индекс узла в общем списке
-                    var ij = nodes.FindIndex(r => r.Id == chainNodes[i].Id);
+                    var ij = nodes.FindIndex(r => r == chainNodes[i]);
                     if (ij == -1)
                         continue;
 
                     // Получим точки из которых строится участок
                     if (nodeIndex.Any())
-                        coords.Add(_edgeService.GetCoord(chainNodes[i - 1].Id, chainNodes[i].Id, chain.Id));
+                        coords.Add(_edgeService.GetCoord(chainNodes[i - 1], chainNodes[i], chain, entityId));
 
                     // Из всех узлов, найденных ранее до текущего можно добраться напрямую
                     int startNumber = 0;
@@ -72,9 +71,12 @@ namespace GridStepAlternative.Calculation
                         var newCoords = AgregatePoints(coords, startNumber);
                         startNumber++;
 
-                        if (result[ii, ij] == null)
-                            result[ii, ij] = new List<Edge>();
-                        result[ii, ij].Add(new Edge {Coordinates = newCoords});
+                        if (newCoords.Any())
+                        {
+                            if (result[ii, ij] == null)
+                                result[ii, ij] = new List<Edge>();
+                            result[ii, ij].Add(new Edge {Coordinates = newCoords});
+                        }
                     }
 
                     if (!nodeIndex.Contains(ij))
@@ -83,7 +85,6 @@ namespace GridStepAlternative.Calculation
 
                 #endregion
             }
-
             return result;
         }
 
@@ -97,7 +98,8 @@ namespace GridStepAlternative.Calculation
         {
             var newCoords = new List<Coordinate>();
             for (int c = startIndex; c < coords.Count; c++)
-                newCoords.AddRange(coords[c]);
+                if (coords[c] != null)
+                    newCoords.AddRange(coords[c]);
             return newCoords;
         }
     }

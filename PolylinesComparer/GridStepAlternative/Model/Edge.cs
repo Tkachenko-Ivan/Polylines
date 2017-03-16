@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using PolylinesComparer.Model;
 
 namespace GridStepAlternative.Model
 {
@@ -11,18 +12,6 @@ namespace GridStepAlternative.Model
     /// </remarks>
     public class Edge
     {
-        /*
-        /// <summary>
-        /// Узел - исток
-        /// </summary>
-        public Node StartNode;
-
-        /// <summary>
-        /// Узел - сток
-        /// </summary>
-        public Node EndNode;
-        */
-
         /// <summary>
         /// Координаты сегмента
         /// </summary>

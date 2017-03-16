@@ -11,6 +11,6 @@ namespace GridStepAlternative.Infrastructure
     /// </remarks>
     public interface IСhainService
     {
-        List<Сhain> GetСhainByEntity(int entityId);
+        List<int> GetСhainByEntity(int entityId);
     }
 }

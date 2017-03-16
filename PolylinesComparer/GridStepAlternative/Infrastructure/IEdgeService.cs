@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using GridStepAlternative.Model;
+using PolylinesComparer.Model;
 
 namespace GridStepAlternative.Infrastructure
 {
@@ -11,6 +11,6 @@ namespace GridStepAlternative.Infrastructure
     /// </remarks>
     public interface IEdgeService
     {
-        List<Coordinate> GetCoord(int id1, int id2, int id3);
+        List<Coordinate> GetCoord(int nodeStart, int nodeEnd, int chainId, int entityId);
     }
 }

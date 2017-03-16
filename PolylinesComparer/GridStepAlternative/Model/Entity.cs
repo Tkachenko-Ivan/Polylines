@@ -1,23 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using PolylinesComparer.Model;
 
 namespace GridStepAlternative.Model
 {
     public class Entity
     {
-        public int Id { get; set; }
+        public int Id;
 
-        public string Name { get; set; }
+        public string Name;
 
         /// <summary>
-        /// Координата цента
+        /// Координата центра
         /// </summary>
         /// <remarks>
-        /// Необягательно выбирать географический центр, 
+        /// Необязательно выбирать геометрический центр, 
         ///   важно лишь то, что эта точка будет считаться началом координат 
         ///   при сравнении линий принадлежащих сущности
         /// </remarks>
-        public Coordinate Center { get; set; }
-
-        public List<Edge>[,] Map { get; set; }
-}
+        public Coordinate Center;
+    }
 }
