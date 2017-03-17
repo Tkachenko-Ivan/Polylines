@@ -188,23 +188,10 @@ namespace GridStepAlternative
                                         result += map.Edges[i, j].Count;
                                     else
                                     {
-                                        var collection = new List<List<Coordinate>>();
-                                        double minX = 0, minY = 0;
-                                        foreach (var edges in map.Edges[i, j])
-                                        {
-                                            collection.Add(edges.Coordinates);
-
-                                            var cMinX = edges.Coordinates.Select(c => c.Lon).Min();
-                                            var cMinY = edges.Coordinates.Select(c => c.Lat).Min();
-                                            minX = cMinX < minX ? cMinX : minX;
-                                            minY = cMinY < minY ? cMinY : minY;
-                                        }
-                                        var collect = collection.SelectMany(c => c);
-                                            minX = collection.SelectMany(c => c).Min(c => c.Lon);
-                                            minY = collection.SelectMany(c => c).Min(c => c.Lat);
-                                            var center = new Coordinate(minX, minY);
-
-                                       
+                                        var collection = map.Edges[i, j].Select(edges => edges.Coordinates).ToList();
+                                        var minX = collection.SelectMany(c => c).Min(c => c.Lon) - grid * 0.5;
+                                        var minY = collection.SelectMany(c => c).Min(c => c.Lat) - grid * 0.5;
+                                        var center = new Coordinate(minX, minY);
 
                                         result += numberService.DifferentIndexesNumber2D(collection, grid, 1, center);
                                     }
