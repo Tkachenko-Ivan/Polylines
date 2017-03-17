@@ -11,7 +11,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
-            <ColumnDefinition Width="140"/>
+            <ColumnDefinition Width="160"/>
         </Grid.ColumnDefinitions>
         
         <Grid.RowDefinitions>
@@ -42,35 +42,83 @@
         </lvc:CartesianChart>
 
         <StackPanel Grid.Row="1" Grid.Column="1">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
+            <TabControl Name="ParamsTab">
+                <TabItem Header="Шаг, м">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
 
-                <TextBlock Grid.ColumnSpan="2" HorizontalAlignment="Center">Размер индекса</TextBlock>
-                <TextBlock Grid.Row="1" Grid.Column="0" Margin="3">От</TextBlock>
-                <TextBlock Grid.Row="2" Grid.Column="0" Margin="3">До</TextBlock>
-                <TextBlock Grid.Row="3" Grid.Column="0" Margin="3">С шагом</TextBlock>
+                        <TextBlock Grid.ColumnSpan="2" HorizontalAlignment="Center">Размер индекса</TextBlock>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="3">От</TextBlock>
+                        <TextBlock Grid.Row="2" Grid.Column="0" Margin="3">До</TextBlock>
+                        <TextBlock Grid.Row="3" Grid.Column="0" Margin="3">С шагом</TextBlock>
 
-                <TextBox Name="From" Grid.Row="1" Grid.Column="1" Margin="3" Text="0" 
+                        <TextBlock Grid.Row="4" Grid.Column="0" Margin="3,9,3,3">Допуск, %</TextBlock>
+
+                        <TextBox Name="FromS" Grid.Row="1" Grid.Column="1" Margin="3" Text="0" 
                          PreviewTextInput="PreviewTextInput"
                          DataObject.Pasting="TextBoxPasting"/>
-                <TextBox Name="To" Grid.Row="2" Grid.Column="1" Margin="3" Text="100"
+                        <TextBox Name="ToS" Grid.Row="2" Grid.Column="1" Margin="3" Text="100"
                          PreviewTextInput="PreviewTextInput"
                          DataObject.Pasting="TextBoxPasting"/>
-                <TextBox Name="Step" Grid.Row="3" Grid.Column="1" Margin="3" Text="1"
+                        <TextBox Name="StepS" Grid.Row="3" Grid.Column="1" Margin="3" Text="1"
                          PreviewTextInput="PreviewTextInput"
                          DataObject.Pasting="TextBoxPasting"/>
 
-            </Grid>
+                        <TextBox Name="ConstParamS" Grid.Row="4" Grid.Column="1" Margin="3,9,3,3" Text="90"
+                         PreviewTextInput="PreviewTextInput"
+                         DataObject.Pasting="TextBoxPasting"/>
 
+                    </Grid>
+                </TabItem>
+                
+                <TabItem Header="Допуск">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.ColumnSpan="2" HorizontalAlignment="Center">Размер допуска, %</TextBlock>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="3">От</TextBlock>
+                        <TextBlock Grid.Row="2" Grid.Column="0" Margin="3">До</TextBlock>
+                        <TextBlock Grid.Row="3" Grid.Column="0" Margin="3">С шагом</TextBlock>
+
+                        <TextBlock Grid.Row="4" Grid.Column="0" Margin="3,9,3,3">Сетка, м</TextBlock>
+
+                        <TextBox Name="FromC" Grid.Row="1" Grid.Column="1" Margin="3" Text="0" 
+                         PreviewTextInput="PreviewTextInput"
+                         DataObject.Pasting="TextBoxPasting"/>
+                        <TextBox Name="ToC" Grid.Row="2" Grid.Column="1" Margin="3" Text="100"
+                         PreviewTextInput="PreviewTextInput"
+                         DataObject.Pasting="TextBoxPasting"/>
+                        <TextBox Name="StepC" Grid.Row="3" Grid.Column="1" Margin="3" Text="1"
+                         PreviewTextInput="PreviewTextInput"
+                         DataObject.Pasting="TextBoxPasting"/>
+
+                        <TextBox Name="ConstParamC" Grid.Row="4" Grid.Column="1" Margin="3,9,3,3" Text="50"
+                         PreviewTextInput="PreviewTextInput"
+                         DataObject.Pasting="TextBoxPasting"/>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+ 
             <CheckBox Name="AllCompare" IsChecked="True" Margin="3,5,3,3">
                 <TextBox TextWrapping="Wrap">Сравнивать всех со всеми</TextBox>
             </CheckBox>

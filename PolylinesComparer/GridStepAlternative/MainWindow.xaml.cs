@@ -26,47 +26,99 @@ namespace GridStepAlternative
         public List<string> Labels { get; set; }
 
         /// <summary>
-        /// Начальное значение размера индексной сетки
+        /// Начальное значение
         /// </summary>
         public int FromValue
         {
             get
             {
                 int value;
-                if (int.TryParse(From.Text, out value))
+
+                if (ParamsTab.SelectedIndex == 0)
+                {
+                    if (int.TryParse(FromS.Text, out value))
+                        return value;
+                    FromS.Text = "0";
+                    return 0;
+                }
+
+                if (int.TryParse(FromC.Text, out value) && value <= 100)
                     return value;
-                From.Text = "0";
+                FromC.Text = "0";
                 return 0;
             }
         }
 
         /// <summary>
-        /// Конечное значение размера индексной сетки
+        /// Конечное значение
         /// </summary>
         public int ToValue
         {
             get
             {
                 int value;
-                if (int.TryParse(To.Text, out value))
+
+                if (ParamsTab.SelectedIndex == 0)
+                {
+                    if (int.TryParse(ToS.Text, out value))
+                        return value;
+                    ToS.Text = "100";
+                    return 100;
+                }
+
+                
+                if (int.TryParse(ToC.Text, out value) && value <= 100)
                     return value;
-                To.Text = "100";
+                ToC.Text = "100";
                 return 100;
             }
         }
 
         /// <summary>
-        /// Шаг изменения размера индексной сетки
+        /// Шаг изменения
         /// </summary>
         public int StepValue
         {
             get
             {
                 int value;
-                if (int.TryParse(Step.Text, out value))
+
+                if (ParamsTab.SelectedIndex == 0)
+                {
+                    if (int.TryParse(StepS.Text, out value))
+                        return value;
+                    StepS.Text = "1";
+                    return 1;
+                }
+
+                if (int.TryParse(StepC.Text, out value))
                     return value;
-                Step.Text = "1";
+                StepC.Text = "1";
                 return 1;
+            }
+        }
+
+        /// <summary>
+        /// Не изменяемый параметр
+        /// </summary>
+        public int ConstValue
+        {
+            get
+            {
+                int value;
+
+                if (ParamsTab.SelectedIndex == 0)
+                {
+                    if (int.TryParse(ConstParamS.Text, out value))
+                        return value ;
+                    ConstParamS.Text = "80";
+                    return 80;
+                }
+
+                if (int.TryParse(ConstParamC.Text, out value) && value <= 100)
+                    return value;
+                ConstParamC.Text = "50";
+                return 50;
             }
         }
 
@@ -105,14 +157,19 @@ namespace GridStepAlternative
 
                 int fromValue = 0, toValue = 0, stepValue = 0;
                 string folder = "";
-                bool allCompare = true;
+                bool allCompare = true, isStepDifferent = true;
+                int constValue = 80;
                 Dispatcher.Invoke(new Action(() =>
                 {
                     fromValue = FromValue;
                     toValue = ToValue;
                     stepValue = StepValue;
+                    constValue = ConstValue;
+
                     folder = FolderPath.Text;
+
                     allCompare = AllCompare.IsChecked.Value;
+                    isStepDifferent = ParamsTab.SelectedIndex == 0;              
                 }));
 
                 // TODO: Можно добавить сюда свои реализации сервисов данных: INodeService, IСhainService, IEntityService, IEdgeService
@@ -153,30 +210,40 @@ namespace GridStepAlternative
                                 collection.AddRange(map.Edges[i, j].Select(edge => edge.Coordinates).ToList());
 
                         // Изменение размеров ячеек индексной сетки
-                        for (int grid = fromValue; grid <= toValue; grid += stepValue)
+                        for (int value = fromValue;
+                            value <= toValue || !isStepDifferent && value <= 100;
+                            value += stepValue)
                         {
+                            var grid = isStepDifferent ? value : constValue;
+                            var compliance = isStepDifferent ? (double)constValue / 100 : (double)value / 100;
+
                             var center = new Coordinate(map.Entity.Center.Lon - grid * 0.5,
                                 map.Entity.Center.Lat - grid * 0.5);
 
                             // Определить количество уникальных рёбер
-                            var result = grid == 0
+                            var result = value == 0
                                 ? collection.Count
-                                : numberService.DifferentIndexesNumber2D(collection, grid, 1,
+                                : numberService.DifferentIndexesNumber2D(collection, grid, compliance,
                                     center);
                             Dispatcher.Invoke(new Action(() =>
                             {
                                 line.Values.Add(result);
                             }));
 
-                            log.Trace($"Ячейка {grid} - результат {result}");
+                            log.Trace($"{value} - результат {result}");
                         }
                     }
                     else
                     {
                         // Сравнивать только те рёбра, которые связывают одинаковые вершины
 
-                        for (int grid = fromValue; grid <= toValue; grid += stepValue)
+                        for (int value = fromValue;
+                            value <= toValue || !isStepDifferent && value <= 100;
+                            value += stepValue)
                         {
+                            var grid = isStepDifferent ? value : constValue;
+                            var compliance = isStepDifferent ? (double)constValue / 100 : (double)value / 100;
+
                             var result = 0;
                             for (int i = 0; i < count; i++)
                             for (int j = 0; j < count; j++)
@@ -184,7 +251,7 @@ namespace GridStepAlternative
                                 {
                                     if (map.Edges[i, j].Count == 1)
                                         result++;
-                                    else if (grid == 0)
+                                    else if (value == 0)
                                         result += map.Edges[i, j].Count;
                                     else
                                     {
@@ -193,7 +260,8 @@ namespace GridStepAlternative
                                         var minY = collection.SelectMany(c => c).Min(c => c.Lat) - grid * 0.5;
                                         var center = new Coordinate(minX, minY);
 
-                                        result += numberService.DifferentIndexesNumber2D(collection, grid, 1, center);
+                                        result += numberService.DifferentIndexesNumber2D(collection, grid, compliance,
+                                            center);
                                     }
                                 }
 
@@ -202,7 +270,7 @@ namespace GridStepAlternative
                                 line.Values.Add(result);
                             }));
 
-                            log.Trace($"Ячейка {grid} - результат {result}");
+                            log.Trace($"{value} - результат {result}");
                         }
                     }
                 }
