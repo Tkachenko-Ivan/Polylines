@@ -99,7 +99,7 @@ namespace GridStepAlternative
         }
 
         /// <summary>
-        /// Не изменяемый параметр
+        /// Неизменяемый параметр
         /// </summary>
         public int ConstValue
         {
@@ -109,13 +109,13 @@ namespace GridStepAlternative
 
                 if (ParamsTab.SelectedIndex == 0)
                 {
-                    if (int.TryParse(ConstParamS.Text, out value))
-                        return value ;
+                    if (int.TryParse(ConstParamS.Text, out value) && value <= 100)
+                        return value;
                     ConstParamS.Text = "80";
                     return 80;
                 }
 
-                if (int.TryParse(ConstParamC.Text, out value) && value <= 100)
+                if (int.TryParse(ConstParamC.Text, out value))
                     return value;
                 ConstParamC.Text = "50";
                 return 50;
@@ -211,7 +211,7 @@ namespace GridStepAlternative
 
                         // Изменение размеров ячеек индексной сетки
                         for (int value = fromValue;
-                            value <= toValue || !isStepDifferent && value <= 100;
+                            value <= toValue && (!isStepDifferent && value <= 100 || isStepDifferent);
                             value += stepValue)
                         {
                             var grid = isStepDifferent ? value : constValue;
@@ -238,7 +238,7 @@ namespace GridStepAlternative
                         // Сравнивать только те рёбра, которые связывают одинаковые вершины
 
                         for (int value = fromValue;
-                            value <= toValue || !isStepDifferent && value <= 100;
+                            value <= toValue && (!isStepDifferent && value <= 100 || isStepDifferent); 
                             value += stepValue)
                         {
                             var grid = isStepDifferent ? value : constValue;
