@@ -7,7 +7,7 @@ using PolylinesComparer.Model;
 namespace PolylinesComparerTests
 {
     /// <summary>
-    /// Тестируется построение индекса для значений лежащих в отрицательной зоне пространственного индекса
+    /// Тестирование построения индекса для значений лежащих в отрицательной зоне пространственного индекса
     /// </summary>
     [TestClass]
     public class NegativeIndexTests

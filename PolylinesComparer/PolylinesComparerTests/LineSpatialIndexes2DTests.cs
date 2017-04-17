@@ -88,6 +88,9 @@ namespace PolylinesComparerTests
         /// Тест на построение индекса линии, 
         ///     которая полностью умещается в одной единственной ячейке пространственного индекса
         /// </summary>
+        /// <remarks>
+        /// Тест должен показать что эта ячейка попала в индекс.
+        /// </remarks>
         [TestMethod]
         public void LineInCellIndexes2DTest()
         {
@@ -387,6 +390,9 @@ namespace PolylinesComparerTests
         /// Тестирование построения индекса линии, 
         ///     когда граничные точки которой, лежат прямо на сетке пространственного индекса
         /// </summary>
+        /// <remarks>
+        /// Тест должен показать что все смежные ячейки попали в индекс. 
+        /// </remarks>
         [TestMethod]
         public void PointOnGridIndexes2DTest()
         {

@@ -7,7 +7,7 @@ using PolylinesComparer.Model;
 namespace PolylinesComparerTests
 {
     /// <summary>
-    /// Тестирование создания пространственных индексов
+    /// Тестирование создания пространственных индексов в трёхмерном пространстве
     /// </summary>
     [TestClass]
     public class LineSpatialIndexes3DTests
