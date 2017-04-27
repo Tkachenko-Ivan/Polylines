@@ -89,7 +89,7 @@ namespace PolylinesComparerTests
         [TestMethod]
         public void NegativeIndexPositiveOriginTest3D()
         {
-            var indexesService = new LineSpatialIndexesService(10, new Coordinate(20, 20, 20));
+            var indexesService = new LineSpatialIndexesService(20, new Coordinate(20, 20, 20));
             var line = new List<Coordinate>
             {
                 new Coordinate(-19, -19, -9),
@@ -98,16 +98,12 @@ namespace PolylinesComparerTests
 
             var index = indexesService.GetLineSpatial3DIndexes(line);
             var rows = index.Select(ind => ind.Layer).Distinct().ToList();
-            Assert.AreEqual(9, rows.Count, "Неверное количество слоёв");
-            Assert.IsTrue(rows.Any(sp => sp == -3));
+            Assert.AreEqual(5, rows.Count, "Неверное количество слоёв");
             Assert.IsTrue(rows.Any(sp => sp == -2));
             Assert.IsTrue(rows.Any(sp => sp == -1));
             Assert.IsTrue(rows.Any(sp => sp == 0));
             Assert.IsTrue(rows.Any(sp => sp == 1));
             Assert.IsTrue(rows.Any(sp => sp == 2));
-            Assert.IsTrue(rows.Any(sp => sp == 3));
-            Assert.IsTrue(rows.Any(sp => sp == 4));
-            Assert.IsTrue(rows.Any(sp => sp == 5));
         }
 
         /// <summary>
@@ -187,7 +183,7 @@ namespace PolylinesComparerTests
         [TestMethod]
         public void NegativeIndexNegativeOriginTest3D()
         {
-            var indexesService = new LineSpatialIndexesService(10, new Coordinate(-20, -20, -20));
+            var indexesService = new LineSpatialIndexesService(20, new Coordinate(-20, -20, -20));
             var line = new List<Coordinate>
             {
                 new Coordinate(49, 19, 39),
@@ -196,16 +192,12 @@ namespace PolylinesComparerTests
 
             var index = indexesService.GetLineSpatial3DIndexes(line);
             var rows = index.Select(ind => ind.Layer).Distinct().ToList();
-            Assert.AreEqual(9, rows.Count, "Неверное количество слоёв");
-            Assert.IsTrue(rows.Any(sp => sp == -3));
+            Assert.AreEqual(5, rows.Count, "Неверное количество слоёв");
             Assert.IsTrue(rows.Any(sp => sp == -2));
             Assert.IsTrue(rows.Any(sp => sp == -1));
             Assert.IsTrue(rows.Any(sp => sp == 0));
             Assert.IsTrue(rows.Any(sp => sp == 1));
             Assert.IsTrue(rows.Any(sp => sp == 2));
-            Assert.IsTrue(rows.Any(sp => sp == 3));
-            Assert.IsTrue(rows.Any(sp => sp == 4));
-            Assert.IsTrue(rows.Any(sp => sp == 5));
         }
     }
 }
